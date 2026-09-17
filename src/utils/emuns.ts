@@ -111,6 +111,8 @@ export const API_MUTATION_KEY = {
   RECORD_PAYMENT: "record-payment",
   REVERSE_PAYMENT: "reverse-payment",
   GRANT_CONCESSION: "grant-concession",
+  EMAIL_FEE_RECEIPT: "email-fee-receipt",
+  EMAIL_REPORT_CARD: "email-report-card",
   CREATE_GRADING_SCHEME: "create-grading-scheme",
   CREATE_EXAM: "create-exam",
   ADD_EXAM_SUBJECTS: "add-exam-subjects",

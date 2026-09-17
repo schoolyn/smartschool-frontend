@@ -164,6 +164,27 @@ export const useGetPaymentLedger = (organizationId: string) =>
     enabled: !!organizationId,
   });
 
+export const downloadFeeReceipt = async (organizationId: string, paymentId: string) => {
+  const result = await apiClient.get(`${base(organizationId)}/payment/${paymentId}/receipt`, { responseType: "blob" });
+  const url = window.URL.createObjectURL(new Blob([result.data], { type: "application/pdf" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `receipt-${paymentId}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
+// emails the same PDF to the caller's own registered address — no arbitrary recipient
+export const useEmailFeeReceipt = (organizationId: string) =>
+  useMutation<void, IAPIError, string>({
+    mutationKey: [API_MUTATION_KEY.EMAIL_FEE_RECEIPT],
+    mutationFn: async (paymentId) => {
+      await apiClient.post(`${base(organizationId)}/payment/${paymentId}/receipt/email`);
+    },
+  });
+
 interface IGrantConcessionPayload {
   studentFeeId: string;
   amount: number;

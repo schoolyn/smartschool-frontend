@@ -206,3 +206,12 @@ export const downloadReportCard = async (organizationId: string, examId: string,
   link.remove();
   window.URL.revokeObjectURL(url);
 };
+
+// emails the same PDF to the caller's own registered address — no arbitrary recipient
+export const useEmailReportCard = (organizationId: string) =>
+  useMutation<void, IAPIError, { examId: string; studentId: string }>({
+    mutationKey: [API_MUTATION_KEY.EMAIL_REPORT_CARD],
+    mutationFn: async ({ examId, studentId }) => {
+      await apiClient.post(`${base(organizationId)}/exam/${examId}/student/${studentId}/report-card/email`);
+    },
+  });
