@@ -766,3 +766,13 @@ export interface SelectDropdownProps {
   className?: string;
   disabled?: boolean;
 }
+
+export interface IEmailLog {
+  id: string;
+  recipientEmail: string;
+  type: string;
+  subject: string;
+  status: "sent" | "failed" | "skipped";
+  reason?: string;
+  createdAt: string;
+}

@@ -46,6 +46,16 @@
   @apply text-gray-400;
 }
 
+/* base-400/600 (tailwind.config.js's custom near-black/gray text pair) had no dark
+   override at all — near-black text on a dark card background was invisible */
+.dark .text-base-400 {
+  @apply text-white;
+}
+
+.dark .text-base-600 {
+  @apply text-gray-400;
+}
+
 .dark .border-gray-200 {
   @apply border-gray-700;
 }
@@ -227,6 +237,9 @@
 }
 .dark .hover\:bg-primary-100:hover {
   @apply bg-primary-900 bg-opacity-60;
+}
+.dark .hover\:bg-primary-50:hover {
+  @apply bg-primary-900 bg-opacity-30;
 }
 .dark .border-primary-300 {
   @apply border-primary-700;

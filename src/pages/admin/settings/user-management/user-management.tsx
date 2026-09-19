@@ -16,6 +16,7 @@ const UserManagement = () => {
           <TabsList>
             <TabsTrigger value="0">{t("labels.profile")}</TabsTrigger>
             <TabsTrigger value="1">{t("labels.user_management")}</TabsTrigger>
+            <TabsTrigger value="2">{t("labels.notifications")}</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

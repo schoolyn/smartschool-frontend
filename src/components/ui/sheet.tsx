@@ -24,29 +24,53 @@ const SheetOverlay = React.forwardRef<
 ));
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-const SheetContent = React.forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-sm flex-col border-l border-gray-200 bg-white shadow-xl transition ease-in-out",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right data-[state=closed]:duration-200 data-[state=open]:duration-300",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none">
-        <XMarkIcon className="h-5 w-5" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </SheetPortal>
-));
+const sheetSideClasses = {
+  // notification panel etc. — unaffected by adding "bottom"
+  right: cn(
+    "inset-y-0 right-0 h-full w-full max-w-sm border-l",
+    "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right"
+  ),
+  // mobile action sheets (e.g. the sidebar user menu on small screens) — slides up
+  // from the bottom, capped short of the full viewport so it reads as a sheet, not
+  // a full-screen takeover; content scrolls internally if it's taller than that
+  bottom: cn(
+    "inset-x-0 bottom-0 w-full max-h-[85vh] rounded-t-2xl border-t",
+    "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom"
+  ),
+};
+
+interface SheetContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  side?: keyof typeof sheetSideClasses;
+}
+
+const SheetContent = React.forwardRef<React.ElementRef<typeof DialogPrimitive.Content>, SheetContentProps>(
+  ({ className, children, side = "right", ...props }, ref) => (
+    <SheetPortal>
+      <SheetOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          "fixed z-50 flex flex-col border-gray-200 bg-white shadow-xl transition ease-in-out",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300",
+          sheetSideClasses[side],
+          className
+        )}
+        {...props}
+      >
+        {side === "bottom" && (
+          <div className="flex justify-center pt-2 pb-1" aria-hidden="true">
+            <div className="h-1.5 w-10 rounded-full bg-gray-300" />
+          </div>
+        )}
+        {children}
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none">
+          <XMarkIcon className="h-5 w-5" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </SheetPortal>
+  )
+);
 SheetContent.displayName = DialogPrimitive.Content.displayName;
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

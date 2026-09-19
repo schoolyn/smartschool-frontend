@@ -148,6 +148,7 @@ const AdminAttendance = () => {
           ) : c.reportRows.length === 0 ? (
             <p className="px-4 py-5 text-sm text-gray-500">No attendance marked for this section in this range.</p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -176,6 +177,7 @@ const AdminAttendance = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       )}

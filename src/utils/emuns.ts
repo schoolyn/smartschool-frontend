@@ -60,6 +60,7 @@ export const API_QUERY_KEY = {
   GET_MY_PTM_BOOKINGS: "get-my-ptm-bookings",
   GET_MY_PTM_AGENDA: "get-my-ptm-agenda",
   GET_FEE_HEADS: "get-fee-heads",
+  GET_EMAIL_NOTIFICATION_LOG: "get-email-notification-log",
   GET_FEE_STRUCTURES: "get-fee-structures",
   GET_STUDENT_FEE_SUMMARY: "get-student-fee-summary",
   GET_MY_FEES: "get-my-fees",
@@ -77,6 +78,7 @@ export const API_QUERY_KEY = {
 };
 
 export const API_MUTATION_KEY = {
+  UPDATE_EMAIL_NOTIFICATION_SETTINGS: "update-email-notification-settings",
   SIGNIN: "signin",
   FORGOT_PASSWORD: "forgot-password",
   RESET_PASSWORD: "reset-password",
@@ -111,6 +113,8 @@ export const API_MUTATION_KEY = {
   RECORD_PAYMENT: "record-payment",
   REVERSE_PAYMENT: "reverse-payment",
   GRANT_CONCESSION: "grant-concession",
+  EMAIL_FEE_RECEIPT: "email-fee-receipt",
+  EMAIL_REPORT_CARD: "email-report-card",
   CREATE_GRADING_SCHEME: "create-grading-scheme",
   CREATE_EXAM: "create-exam",
   ADD_EXAM_SUBJECTS: "add-exam-subjects",
