@@ -13,6 +13,8 @@ const useUserManagementController = () => {
   useEffect(() => {
     if (location.pathname.includes("/settings/add-user")) {
       setSelectedIndex(1);
+    } else if (location.pathname.includes("/settings/notifications")) {
+      setSelectedIndex(2);
     } else if (location.pathname.includes("/settings/profile")) {
       setSelectedIndex(0);
     } else {
@@ -27,7 +29,9 @@ const useUserManagementController = () => {
       const targetPath =
         index === 0
           ? `/${organizationId}/admin/settings/profile`
-          : `/${organizationId}/admin/settings/add-user`;
+          : index === 1
+            ? `/${organizationId}/admin/settings/add-user`
+            : `/${organizationId}/admin/settings/notifications`;
 
       if (location.pathname !== targetPath) {
         navigate(targetPath);
