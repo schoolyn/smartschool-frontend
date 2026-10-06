@@ -32,14 +32,13 @@ both in sync if either changes.
 
 ## Deployment
 
-See **[deploy/DEPLOYMENT.md](./deploy/DEPLOYMENT.md)** — S3 (private bucket,
-CloudFront Origin Access Control) + CloudFront for free HTTPS via its default
-`*.cloudfront.net` domain, including the SPA-routing error-page config that's
-easy to miss.
+See **[deploy/DEPLOYMENT.md](./deploy/DEPLOYMENT.md)** — Vercel, connected
+directly to this repo (auto-detects Vite, zero config), with `vercel.json`'s
+SPA-fallback rewrite handling the client-side-routing gotcha that CloudFront
+needed custom error pages for.
 
 ## CI
 
 `.github/workflows/ci.yml` runs on every push/PR to `main`: lint, typecheck,
-test, build. A `deploy` job runs after tests pass on `main` — builds with the
-real `.env.production`, syncs to S3, and invalidates the CloudFront cache. See
-`deploy/DEPLOYMENT.md` for the one-time AWS setup and GitHub secrets it needs.
+test, build. No manual deploy job — Vercel's own GitHub integration deploys
+on every push to `main` once the repo is connected there.

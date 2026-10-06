@@ -24,29 +24,5 @@ jobs:
       - run: npm test
       - run: npm run build
 
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - run: npm ci
-      # uses .env.production automatically (vite build defaults to mode "production")
-      - run: npm run build
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - run: aws s3 sync dist/ s3://${{ secrets.S3_BUCKET }} --delete
-
-      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+  # no deploy job here — Vercel's own GitHub integration deploys every push to main
+  # automatically once the repo is connected there (see deploy/DEPLOYMENT.md)
