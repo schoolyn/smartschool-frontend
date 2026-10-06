@@ -6,16 +6,21 @@ import { useSidebarController } from "./sidebar-controller";
 
 interface SidebarProps {
   isCollapsed: boolean;
+  isMobileOpen: boolean;
 }
 
-const Sidebar = ({ isCollapsed }: SidebarProps) => {
+const Sidebar = ({ isCollapsed, isMobileOpen }: SidebarProps) => {
   const { sections } = useSidebarController();
 
   return (
     <div
-      className={`${
-        isCollapsed ? "w-16" : "w-56"
-      } app-shell-surface shrink-0 bg-white border-r border-gray-200 z-10 transition-[width] duration-300 ease-in-out flex flex-col h-full`}
+      className={`
+        fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
+        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:relative lg:z-10 lg:translate-x-0 lg:transition-[width]
+        ${isCollapsed ? "lg:w-16" : "lg:w-56"}
+        app-shell-surface bg-white border-r border-gray-200 shrink-0 flex flex-col h-full
+      `}
     >
       <div className="flex-1 overflow-y-auto pb-4">
         {sections.map((section, sectionIndex) => (

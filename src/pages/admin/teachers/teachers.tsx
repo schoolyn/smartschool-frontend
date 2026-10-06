@@ -23,6 +23,7 @@ const AdminTeachers = () => {
           ) : c.teachers.length === 0 ? (
             <NoRecordFound t={t} searchTerm="" clearFilters={() => {}} />
           ) : (
+            <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -51,6 +52,7 @@ const AdminTeachers = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

@@ -16,6 +16,10 @@ vi.mock("../../../context/auth-context", () => ({
   useAuth: () => ({ login: vi.fn() }),
 }));
 
+vi.mock("@/context/theme-context", () => ({
+  useTheme: () => ({ theme: "light" }),
+}));
+
 const renderLogin = () => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(

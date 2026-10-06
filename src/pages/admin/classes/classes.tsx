@@ -145,6 +145,7 @@ const AdminClasses = () => {
             ) : c.academicYears.length === 0 ? (
               <NoRecordFound t={t} searchTerm="" clearFilters={() => {}} />
             ) : (
+              <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -171,6 +172,7 @@ const AdminClasses = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         )}
@@ -250,6 +252,7 @@ const AdminClasses = () => {
             ) : c.classes.length === 0 ? (
               <NoRecordFound t={t} searchTerm="" clearFilters={() => {}} />
             ) : (
+              <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -268,6 +271,7 @@ const AdminClasses = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         )}
@@ -347,6 +351,7 @@ const AdminClasses = () => {
             ) : c.sections.length === 0 ? (
               <NoRecordFound t={t} searchTerm="" clearFilters={() => {}} />
             ) : (
+              <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -365,6 +370,7 @@ const AdminClasses = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         )}
@@ -444,6 +450,7 @@ const AdminClasses = () => {
             ) : c.subjects.length === 0 ? (
               <NoRecordFound t={t} searchTerm="" clearFilters={() => {}} />
             ) : (
+              <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -462,6 +469,7 @@ const AdminClasses = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         )}
@@ -606,6 +614,7 @@ const AdminClasses = () => {
             ) : c.teacherAssignments.length === 0 ? (
               <NoRecordFound t={t} searchTerm="" clearFilters={() => {}} />
             ) : (
+              <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -628,6 +637,7 @@ const AdminClasses = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         )}

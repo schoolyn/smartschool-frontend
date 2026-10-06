@@ -5,13 +5,14 @@ import SectionHeader from "@/components/section-header";
 import Spinner from "@/components/spinner";
 import NoRecordFound from "@/components/no-record-found";
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/components/table";
-import { useGetMyResults, downloadReportCard } from "@/pages/admin/reports/service/exams-service";
+import { useGetMyResults, downloadReportCard, useEmailReportCard } from "@/pages/admin/reports/service/exams-service";
 import { useTranslation } from "react-i18next";
 
 const ParentReports = () => {
   const { t } = useTranslation();
   const { organizationId } = useParams();
   const getMyResults = useGetMyResults(organizationId || "");
+  const emailReportCard = useEmailReportCard(organizationId || "");
   const items = getMyResults.data?.items || [];
 
   const handleDownload = async (examId: string, studentId: string) => {
@@ -20,6 +21,16 @@ const ParentReports = () => {
     } catch {
       toast.error("Could not download the report card. Please try again.");
     }
+  };
+
+  const handleEmail = (examId: string, studentId: string) => {
+    emailReportCard.mutate(
+      { examId, studentId },
+      {
+        onSuccess: () => toast.success("Report card emailed to your registered email address."),
+        onError: () => toast.error("Could not email the report card. Please try again."),
+      }
+    );
   };
 
   return (
@@ -64,13 +75,27 @@ const ParentReports = () => {
                             <p className="text-sm text-gray-500 mt-1">
                               {result.totals.percentage}% · Grade {result.grade} · GPA {result.gpa}
                             </p>
-                            <button
-                              type="button"
-                              onClick={() => handleDownload(typeof result.examId === "object" ? result.examId.id : result.examId, item.studentId)}
-                              className="text-xs text-primary-600 hover:text-primary-800 mt-1"
-                            >
-                              Download report card
-                            </button>
+                            <div className="flex gap-3 justify-end mt-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDownload(typeof result.examId === "object" ? result.examId.id : result.examId, item.studentId)
+                                }
+                                className="text-xs text-primary-600 hover:text-primary-800"
+                              >
+                                Download report card
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleEmail(typeof result.examId === "object" ? result.examId.id : result.examId, item.studentId)
+                                }
+                                disabled={emailReportCard.isPending}
+                                className="text-xs text-primary-600 hover:text-primary-800 disabled:opacity-50"
+                              >
+                                Email me a copy
+                              </button>
+                            </div>
                           </div>
                         </div>
 
