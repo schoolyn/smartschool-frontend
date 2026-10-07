@@ -30,7 +30,7 @@ export const useDashboardController = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  // Highcharts renders its own inline SVG styling — Tailwind's dark-mode CSS can't
+  // Highcharts renders its own inline SVG styling; Tailwind's dark-mode CSS can't
   // reach it, so the chart options themselves have to switch colors on theme change
   const isDark = theme === "dark";
   const chartAxisLabelColor = isDark ? "#9CA3AF" : "#6B7280";
@@ -95,14 +95,13 @@ export const useDashboardController = () => {
         color: "#0276FC",
         lineWidth: 3,
         marker: { enabled: true, radius: 5, lineWidth: 2, lineColor: "#ffffff" },
-        // a multi-stop gradient fill under the curve, rather than a flat single color —
-        // real Highcharts config, not a static image effect
+        // a gradient fill under the curve, rather than a flat single color: real Highcharts
+        // config, not a static image effect. Single brand-blue hue fading to transparent.
         fillColor: {
           linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
           stops: [
-            [0, "rgba(2, 118, 252, 0.45)"],
-            [0.5, "rgba(147, 51, 234, 0.25)"],
-            [1, "rgba(236, 72, 153, 0.05)"],
+            [0, "rgba(2, 118, 252, 0.4)"],
+            [1, "rgba(2, 118, 252, 0.02)"],
           ],
         },
       },
