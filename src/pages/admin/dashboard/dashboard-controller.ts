@@ -70,7 +70,7 @@ export const useDashboardController = () => {
 
   const studentPerformanceOptions = {
     credits: { enabled: false },
-    chart: { type: "line", height: 300, style: { fontFamily: "inherit" }, backgroundColor: "transparent" },
+    chart: { type: "areaspline", height: 300, style: { fontFamily: "inherit" }, backgroundColor: "transparent" },
     title: {
       text: "Exam Performance Trend",
       style: { fontSize: "16px", fontWeight: "500", color: chartTitleColor },
@@ -93,6 +93,18 @@ export const useDashboardController = () => {
         name: "Average score",
         data: examTrend.length ? examTrend.map((e) => e.percentage) : [0],
         color: "#0276FC",
+        lineWidth: 3,
+        marker: { enabled: true, radius: 5, lineWidth: 2, lineColor: "#ffffff" },
+        // a multi-stop gradient fill under the curve, rather than a flat single color —
+        // real Highcharts config, not a static image effect
+        fillColor: {
+          linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+          stops: [
+            [0, "rgba(2, 118, 252, 0.45)"],
+            [0.5, "rgba(147, 51, 234, 0.25)"],
+            [1, "rgba(236, 72, 153, 0.05)"],
+          ],
+        },
       },
     ],
     legend: { itemStyle: { color: chartLegendColor } },
