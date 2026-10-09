@@ -5,7 +5,7 @@ import { ICreateNoticeRequest } from "@/types";
 
 // platform-default letterhead logo for the print view — a school's own uploaded
 // logo (organizationLogo prop) is a separate, unrelated default further below
-const organisationLogo = "/schoolyn.png";
+const organisationLogo = "/opscul.png";
 
 interface NoticePreviewModalProps {
   isOpen: boolean;

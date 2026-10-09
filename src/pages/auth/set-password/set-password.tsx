@@ -13,7 +13,7 @@ const SetPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center flex-col bg-gray-100">
-      <BrandLogo className="h-12 w-auto mb-2" />
+      <BrandLogo className="h-9 w-auto mb-2" />
       <div className="max-w-sm w-full space-y-8 p-8 bg-white rounded-lg shadow">
         <div>
           <h2 className="mt-2 text-xl font-bold text-gray-900">Set Your Password</h2>

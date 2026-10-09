@@ -5,7 +5,7 @@ const Footer = () => {
         <div className="flex justify-end items-center">
           <div className="flex space-x-4">
             <div className="text-sm text-gray-500">
-              © {new Date().getFullYear()} Schoolyn. All rights reserved.
+              © {new Date().getFullYear()} Opscul. All rights reserved.
             </div>
 
             <a href="#" className="text-sm text-gray-500 hover:text-gray-700">
