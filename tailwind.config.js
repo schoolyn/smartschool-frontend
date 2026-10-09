@@ -5,22 +5,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        // brand accent — every button/link/CTA that needs the app's primary color
-        // uses primary-* instead of a hardcoded Tailwind color family (previously
-        // indigo-*), so changing the brand color is a one-line edit here.
+        // brand accent, now a neutral black/white/gray scale to match the logo.
+        // 600 is the solid button/CTA color (near-black); 700 is its hover (a touch lighter).
+        // Dark-mode inversions (light buttons, light link text) live in src/index.css.
         primary: {
           yankees: "#201F37",
-          50: "#f0f7fe",
-          100: "#ddecfe",
-          200: "#b5d6fd",
-          300: "#78b6fc",
-          400: "#3692fc",
-          500: "#0377fc",
-          600: "#0276FC",
-          700: "#045fc8",
-          800: "#084d9b",
-          900: "#0d3f77",
-          950: "#0a2747",
+          50: "#f5f5f5",
+          100: "#ebebeb",
+          200: "#d4d4d4",
+          300: "#a3a3a3",
+          400: "#737373",
+          500: "#525252",
+          600: "#171717",
+          700: "#404040",
+          800: "#262626",
+          900: "#171717",
+          950: "#0a0a0a",
         },
         base: {
           900: "#9D9CAF",

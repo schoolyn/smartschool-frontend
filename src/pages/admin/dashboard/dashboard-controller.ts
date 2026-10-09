@@ -37,6 +37,10 @@ export const useDashboardController = () => {
   const chartLegendColor = isDark ? "#D1D5DB" : "#4B5563";
   const chartTitleColor = isDark ? "#F9FAFB" : "#1F2937";
   const chartGridLineColor = isDark ? "#374151" : "#E5E7EB";
+  // monochrome series colors: near-black on light surfaces, near-white on dark ones
+  const chartPrimaryColor = isDark ? "#fafafa" : "#171717";
+  const chartPrimaryFillRgb = isDark ? "250, 250, 250" : "23, 23, 23";
+  const chartSecondaryColor = "#a3a3a3";
 
   const { organizationId } = useParams();
   const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
@@ -92,16 +96,16 @@ export const useDashboardController = () => {
       {
         name: "Average score",
         data: examTrend.length ? examTrend.map((e) => e.percentage) : [0],
-        color: "#0276FC",
+        color: chartPrimaryColor,
         lineWidth: 3,
-        marker: { enabled: true, radius: 5, lineWidth: 2, lineColor: "#ffffff" },
+        marker: { enabled: true, radius: 5, lineWidth: 2, lineColor: isDark ? "#262626" : "#ffffff" },
         // a gradient fill under the curve, rather than a flat single color: real Highcharts
-        // config, not a static image effect. Single brand-blue hue fading to transparent.
+        // config, not a static image effect. Single neutral tone fading to transparent.
         fillColor: {
           linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
           stops: [
-            [0, "rgba(2, 118, 252, 0.4)"],
-            [1, "rgba(2, 118, 252, 0.02)"],
+            [0, `rgba(${chartPrimaryFillRgb}, 0.22)`],
+            [1, `rgba(${chartPrimaryFillRgb}, 0.01)`],
           ],
         },
       },
@@ -120,8 +124,8 @@ export const useDashboardController = () => {
       {
         name: "Count",
         data: [
-          { name: "Teachers", y: stats.totalTeachers, color: "#0276FC" },
-          { name: "Students", y: stats.totalStudents, color: "#3692fc" },
+          { name: "Teachers", y: stats.totalTeachers, color: chartPrimaryColor },
+          { name: "Students", y: stats.totalStudents, color: chartSecondaryColor },
         ],
         dataLabels: { style: { color: chartTitleColor, textOutline: "none" } },
       },
@@ -159,7 +163,7 @@ export const useDashboardController = () => {
       {
         name: "Attendance",
         data: monthlyAttendance.length ? monthlyAttendance.map((m) => m.percentage) : [0],
-        color: "#0276FC",
+        color: chartPrimaryColor,
       },
     ],
     plotOptions: { column: { borderRadius: 5 } },

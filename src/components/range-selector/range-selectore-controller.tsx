@@ -125,8 +125,8 @@ const useRangeSelectorController = () => {
           key={day}
           onClick={() => handleDateClick(currentDate)}
           className={`h-8 w-8 rounded-full flex items-center justify-center
-                ${isSelected ? "bg-blue-100" : "hover:bg-gray-100"}
-                ${isRangeEnd ? "bg-blue-500 text-white" : ""}
+                ${isSelected ? "bg-primary-100" : "hover:bg-gray-100"}
+                ${isRangeEnd ? "bg-primary-600 text-white" : ""}
               `}
         >
           {day}

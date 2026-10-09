@@ -112,7 +112,7 @@ const NoticePreviewModal = ({
                 </span>
                 <span
                   className={`px-2 py-1 text-xs leading-5 font-semibold rounded-full ${
-                    notice.type === "holiday" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                    notice.type === "holiday" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                   }`}
                 >
                   {notice.type.charAt(0).toUpperCase() + notice.type.slice(1)}
