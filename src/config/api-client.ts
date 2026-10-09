@@ -138,7 +138,9 @@ apiClient.interceptors.response.use(
     }
 
     if (status === 403) {
-      window.location.href = "/not-access";
+      // a refused page load goes to the access-denied screen; a refused action (create, update,
+      // delete) stays where it happened so the caller can tell the user why it was refused
+      if (originalRequest?.method?.toLowerCase() === "get") window.location.href = "/not-access";
     } else if (status === 405) {
       toast.error("token is expired please login and continue");
       clearSessionAndRedirect();

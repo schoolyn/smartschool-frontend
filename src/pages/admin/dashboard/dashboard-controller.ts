@@ -20,15 +20,15 @@ import { ICreateNoticeRequest } from "@/types";
 import { useGetNoticeList, useCreateNotice } from "../notices/service";
 import { useError } from "@/hooks";
 import { useTheme } from "@/context/theme-context";
+import { useAuth } from "@/context/auth-context";
 import useGetDashboardStats from "./service/get-dashboard-stats";
 import useGetDashboardCharts from "./service/get-dashboard-charts";
-
-const formatMoney = (paise: number) => `${(paise / 100).toFixed(2)}`;
 
 export const useDashboardController = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { user } = useAuth();
 
   // Highcharts renders its own inline SVG styling; Tailwind's dark-mode CSS can't
   // reach it, so the chart options themselves have to switch colors on theme change
@@ -169,8 +169,6 @@ export const useDashboardController = () => {
     plotOptions: { column: { borderRadius: 5 } },
   };
 
-  const isLoading = recentNotices.isLoading || dashboardStats.isLoading;
-
   const openNoticeModal = () => setIsNoticeModalOpen(true);
   const closeNoticeModal = () => setIsNoticeModalOpen(false);
 
@@ -212,21 +210,28 @@ export const useDashboardController = () => {
     navigate(`/${organizationId}/admin/homework`);
   };
 
-  const display = (value: number | null) => (value === null ? "—" : value);
-
+  const base = `/${organizationId}/admin`;
   const statCards = [
-    { title: "Total Students", value: display(stats.totalStudents), icon: UserGroupIcon },
-    { title: "Total Teachers", value: display(stats.totalTeachers), icon: UserIcon },
-    { title: "Total Classes", value: display(stats.totalClasses), icon: AcademicCapIcon },
-    { title: "Active Notices", value: display(stats.activeNotices), icon: BellIcon },
+    { title: "Total Students", value: stats.totalStudents as number | null, icon: UserGroupIcon, to: `${base}/students` },
+    { title: "Total Teachers", value: stats.totalTeachers as number | null, icon: UserIcon, to: `${base}/teachers` },
+    { title: "Total Classes", value: stats.totalClasses as number | null, icon: AcademicCapIcon, to: `${base}/classes` },
+    { title: "Active Notices", value: stats.activeNotices as number | null, icon: BellIcon, to: `${base}/notices` },
     {
       title: "Pending Payments",
-      value: stats.pendingPayments === null ? "—" : formatMoney(stats.pendingPayments),
+      value: stats.pendingPayments === null ? null : stats.pendingPayments / 100,
       icon: CurrencyDollarIcon,
+      to: `${base}/fees`,
+      currency: true,
     },
-    { title: "Attendance Today", value: display(stats.attendanceSubmitted), icon: ClipboardDocumentCheckIcon },
-    { title: "Homeworks Today", value: display(stats.homeworksIssued), icon: BookOpenIcon },
+    { title: "Attendance Today", value: stats.attendanceSubmitted, icon: ClipboardDocumentCheckIcon, to: `${base}/attendance` },
+    { title: "Homeworks Today", value: stats.homeworksIssued, icon: BookOpenIcon, to: `${base}/homework` },
   ];
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const firstName = user?.name?.trim().split(" ")[0];
+  const greetingTitle = firstName ? `${greeting}, ${firstName}` : greeting;
+  const todayLabel = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
 
   const quickActions = [
     { title: "Add New Notice", icon: PlusIcon, action: openNoticeModal },
@@ -241,7 +246,12 @@ export const useDashboardController = () => {
     studentPerformanceOptions,
     teacherStudentRatioOptions,
     monthlyAttendanceOptions,
-    isLoading,
+    isStatsLoading: dashboardStats.isLoading,
+    isNoticesLoading: recentNotices.isLoading,
+    isChartsLoading: dashboardCharts.isLoading,
+    greetingTitle,
+    todayLabel,
+    noticesPath: `${base}/notices`,
     isNoticeModalOpen,
     isUserTypeModalOpen,
     statCards,

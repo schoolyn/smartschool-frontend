@@ -30,7 +30,7 @@ import ParentFees from "../pages/parent/fees";
 import ParentPTM from "../pages/parent/ptm";
 import ParentLeaveRequests from "../pages/parent/leave-requests";
 
-// shared — same profile page for every role, just mounted under each role's own path
+// shared, same profile page for every role, just mounted under each role's own path
 import Profile from "../pages/admin/settings/profile";
 
 // Auth Pages
