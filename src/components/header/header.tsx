@@ -36,7 +36,7 @@ const Header = ({ onToggleSidebar, isCollapsed, onToggleCollapse }: HeaderProps)
               isCollapsed ? "max-w-0 opacity-0" : "max-w-xs opacity-100"
             }`}
           >
-            <BrandLogo className="h-12 w-auto shrink-0" />
+            <BrandLogo className="h-7 w-auto shrink-0" />
           </Link>
           <button
             type="button"

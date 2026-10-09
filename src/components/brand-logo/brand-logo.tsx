@@ -4,14 +4,14 @@ interface BrandLogoProps {
   className?: string;
 }
 
-// schoolyn.png's wordmark text is navy — reads fine on a light background.
-// schoolyn-light.png is the same mark with the wordmark rendered near-white,
-// for use on a dark background instead. One place to pick the right asset.
+// opscul.png is the black wordmark, for light backgrounds.
+// opscul-light.png is the white wordmark, for dark backgrounds.
+// One place to pick the right asset.
 const BrandLogo = ({ className }: BrandLogoProps) => {
   const { theme } = useTheme();
-  const src = theme === "dark" ? "/schoolyn-light.png" : "/schoolyn.png";
+  const src = theme === "dark" ? "/opscul-light.png" : "/opscul.png";
 
-  return <img src={src} alt="Schoolyn" className={className} />;
+  return <img src={src} alt="Opscul" className={className} />;
 };
 
 export default BrandLogo;

@@ -32,7 +32,7 @@ the exact failure mode already hit and fixed locally for `smartschool-website`.
 
 ## 3. Custom domain
 
-Project Settings → Domains → add `app.schoolyn.in` → follow the DNS record
+Project Settings → Domains → add `app.opscul.com` → follow the DNS record
 Vercel shows (account-specific, follow what's actually displayed). HTTPS is
 automatic once DNS propagates.
 

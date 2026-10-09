@@ -26,7 +26,7 @@ const LogoSpinner = () => {
           >
             <img
               src={logo}
-              alt="Schoolyn Logo"
+              alt="Opscul Logo"
               className="w-full h-full object-contain dark:invert"
             />
           </div>
