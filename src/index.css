@@ -87,7 +87,7 @@
 }
 
 .dark .bg-primary-50 {
-  @apply bg-primary-900 bg-opacity-30;
+  background-color: rgb(255 255 255 / 0.1);
 }
 
 .dark .text-primary-700,
@@ -229,23 +229,49 @@
    other status-badge colors already handled above */
 .dark .bg-primary-100,
 .dark .file\:bg-primary-50::file-selector-button {
-  @apply bg-primary-900 bg-opacity-40;
+  background-color: rgb(255 255 255 / 0.1);
 }
 .dark .group:hover .group-hover\:bg-primary-200,
 .dark .hover\:file\:bg-primary-100:hover::file-selector-button {
-  @apply bg-primary-900 bg-opacity-60;
+  background-color: rgb(255 255 255 / 0.2);
 }
 .dark .hover\:bg-primary-100:hover {
-  @apply bg-primary-900 bg-opacity-60;
+  background-color: rgb(255 255 255 / 0.2);
 }
 .dark .hover\:bg-primary-50:hover {
-  @apply bg-primary-900 bg-opacity-30;
+  background-color: rgb(255 255 255 / 0.1);
 }
 .dark .border-primary-300 {
-  @apply border-primary-700;
+  border-color: #525252;
 }
 .dark .file\:text-primary-700::file-selector-button {
   @apply text-primary-300;
+}
+
+/* Solid primary buttons are near-black in light mode, so on dark surfaces they invert to
+   light buttons with dark text; link/accent text and focus colors lighten for the same reason */
+.dark .bg-primary-600 {
+  background-color: #f5f5f5;
+  color: #171717;
+}
+.dark .hover\:bg-primary-700:hover {
+  background-color: #d4d4d4;
+}
+.dark .text-primary-600,
+.dark .text-primary-500,
+.dark .hover\:text-primary-600:hover,
+.dark .group:hover .group-hover\:text-primary-600 {
+  color: #f5f5f5;
+}
+.dark .border-primary-500,
+.dark .focus\:border-primary-500:focus,
+.dark .hover\:border-primary-500:hover,
+.dark .border-primary-600 {
+  border-color: #a3a3a3;
+}
+.dark .focus\:ring-primary-500:focus,
+.dark .ring-primary-500 {
+  --tw-ring-color: #a3a3a3;
 }
 
 /* Global focus styles */

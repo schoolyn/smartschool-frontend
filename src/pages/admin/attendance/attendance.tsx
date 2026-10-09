@@ -16,7 +16,7 @@ const STATUS_STYLES: Record<AttendanceStatus, string> = {
   present: "bg-green-100 text-green-800 border-green-300",
   absent: "bg-red-100 text-red-800 border-red-300",
   late: "bg-amber-100 text-amber-800 border-amber-300",
-  excused: "bg-blue-100 text-blue-800 border-blue-300",
+  excused: "bg-gray-100 text-gray-800 border-gray-300",
 };
 
 const AdminAttendance = () => {
@@ -169,7 +169,7 @@ const AdminAttendance = () => {
                     <td className="px-4 py-3 text-sm text-center text-green-700">{row.present}</td>
                     <td className="px-4 py-3 text-sm text-center text-red-700">{row.absent}</td>
                     <td className="px-4 py-3 text-sm text-center text-amber-700">{row.late}</td>
-                    <td className="px-4 py-3 text-sm text-center text-blue-700">{row.excused}</td>
+                    <td className="px-4 py-3 text-sm text-center text-gray-700">{row.excused}</td>
                     <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">
                       {row.total ? ((row.present / row.total) * 100).toFixed(1) : "0"}%
                     </td>

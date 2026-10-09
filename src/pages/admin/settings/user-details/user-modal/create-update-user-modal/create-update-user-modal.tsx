@@ -81,7 +81,7 @@ const CreateUpdateUserModal = ({
                     />
 
                     {isEditingSelf && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
+                      <div className="bg-gray-50 border border-gray-200 rounded-md p-3 text-sm text-gray-800">
                         You can't change your own role or permissions. Ask another admin if this needs to change.
                       </div>
                     )}

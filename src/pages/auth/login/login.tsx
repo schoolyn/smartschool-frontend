@@ -15,7 +15,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center flex-col bg-gray-100">
-      <BrandLogo className="h-14 w-auto mb-6" />
+      <BrandLogo className="h-11 w-auto mb-6" />
       <div className="max-w-sm w-full space-y-8 p-8 bg-white rounded-lg shadow">
         <div>
           <h2 className="mt-2 text-xl font-bold text-gray-900">{t("labels.welcome")}</h2>

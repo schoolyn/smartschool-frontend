@@ -35,7 +35,7 @@ const statusBadge = (status: string) => {
     status === "published"
       ? "bg-green-100 text-green-800"
       : status === "verified"
-      ? "bg-blue-100 text-blue-800"
+      ? "bg-gray-100 text-gray-800"
       : status === "marks_entry" || status === "scheduled"
       ? "bg-amber-100 text-amber-800"
       : "bg-gray-100 text-gray-700";
