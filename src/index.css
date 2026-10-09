@@ -286,3 +286,19 @@
     @apply border-primary-500 ring-1 ring-primary-500;
   }
 } */
+
+/* gentle staggered entrance for dashboard cards; backwards fill so hover transforms still work afterwards */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.fade-up {
+  animation: fade-up 0.45s ease-out backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+}

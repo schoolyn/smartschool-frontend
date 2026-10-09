@@ -29,6 +29,8 @@ const useError = ({
         navigate("/login");
       } else if (errorCode === "EX-00101") {
         toast.error(t("messages.invalid_credentials"));
+      } else if (mutation.error.response?.Error?.name === "AuthorizationError") {
+        toast.error(mutation.error.response.Error.message || t("messages.something_went_wrong"));
       } else {
         toast.error(t("messages.something_went_wrong"));
       }

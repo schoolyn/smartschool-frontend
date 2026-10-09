@@ -3,6 +3,8 @@ import Cookies from "js-cookie";
 import { USER_ACCESS_KEY } from "../utils";
 import { Navigate } from "react-router-dom";
 import { TenantProvider } from "../context/tenant-context";
+import useIsMobile from "../hooks/is-mobile/is-mobile";
+import MobileNotice from "../components/mobile-notice";
 
 interface PublicRouteProps {
   children: React.ReactNode;
@@ -20,7 +22,7 @@ const useRoutesController = () => {
     const organizationId = Cookies.get(USER_ACCESS_KEY.ORGANIZATION_ID);
 
     if (token && user_role) {
-      // no organizationId here 404s into /not-access — send to the picker instead if none is set yet
+      // no organizationId here 404s into /not-access, send to the picker instead if none is set yet
       return organizationId ? (
         <Navigate to={`/${organizationId}/${user_role}/dashboard`} replace />
       ) : (
@@ -32,12 +34,16 @@ const useRoutesController = () => {
   };
 
   const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, role }) => {
+    const isMobile = useIsMobile();
     const token = Cookies.get(USER_ACCESS_KEY.TOKEN);
     const user_role = Cookies.get(USER_ACCESS_KEY.ROLE);
 
     if (!token || user_role !== role) {
       return <Navigate to="/login" replace />;
     }
+
+    // the signed-in app is not responsive yet, so phones get a notice for now
+    if (isMobile) return <MobileNotice />;
 
     // role checked out; TenantProvider still has to confirm the URL's :organizationId is real
     return <TenantProvider>{children}</TenantProvider>;
