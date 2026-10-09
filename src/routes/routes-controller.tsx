@@ -43,9 +43,16 @@ const useRoutesController = () => {
     return <TenantProvider>{children}</TenantProvider>;
   };
 
+  // unknown URLs: a signed-out visitor should land on login, not an "access denied" page
+  const FallbackRoute: React.FC = () => {
+    const token = Cookies.get(USER_ACCESS_KEY.TOKEN);
+    return <Navigate to={token ? "/not-access" : "/login"} replace />;
+  };
+
   return {
     PublicRoute,
     ProtectedRoute,
+    FallbackRoute,
   };
 };
 
