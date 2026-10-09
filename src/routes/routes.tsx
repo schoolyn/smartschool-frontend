@@ -43,9 +43,17 @@ import Organization from "../pages/auth/organization";
 import Platform from "../pages/platform";
 
 const Routes = () => {
-  const { PublicRoute, ProtectedRoute } = useRoutesController();
+  const { PublicRoute, ProtectedRoute, FallbackRoute } = useRoutesController();
 
   return createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <PublicRoute>
+          <Navigate to="/login" replace />
+        </PublicRoute>
+      ),
+    },
     {
       path: "/login",
       element: (
@@ -230,7 +238,7 @@ const Routes = () => {
     },
     {
       path: "*",
-      element: <Navigate to="/not-access" replace />,
+      element: <FallbackRoute />,
     },
   ]);
 };
