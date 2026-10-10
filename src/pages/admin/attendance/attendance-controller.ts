@@ -28,8 +28,8 @@ const useAttendanceController = () => {
   const [reportTo, setReportTo] = useState(today());
 
   const academicYears = useGetAcademicYears(organizationId);
-  const classes = useGetClasses(organizationId, academicYearId);
-  const sections = useGetSections(organizationId, classId);
+  const classes = useGetClasses(organizationId, academicYearId, "active");
+  const sections = useGetSections(organizationId, classId, "active");
   const roster = useGetSectionRoster(organizationId, sectionId);
   const existing = useGetSectionAttendance(organizationId, sectionId, date);
   const markAttendance = useMarkAttendance(organizationId);

@@ -13,7 +13,7 @@ import useStudentsListController from "./students-list-controller";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import CreateUpdateStudentModal from "../student-modal/create-update-student-modal";
 import BulkUploadModal from "../student-modal/bulk-upload-modal";
-import StudentRowMenu from "./student-row-menu";
+import RowMenu from "@/components/row-menu";
 import { studentToCsvRow } from "../student-csv";
 
 // the parent of this student, when they were invited but have not set a password yet
@@ -217,12 +217,14 @@ const StudentsList = () => {
                         {new Date(student.dateOfBirth).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-center">
-                        <StudentRowMenu
-                          onEdit={() => onClickEditStudent(student.id)}
-                          onDelete={() => handleDeleteAction(student.id)}
-                          onResendInvite={
-                            pendingParent(student) ? () => handleResendInvite(pendingParent(student)!.id) : undefined
-                          }
+                        <RowMenu
+                          items={[
+                            { label: t("buttons.edit"), onSelect: () => onClickEditStudent(student.id) },
+                            ...(pendingParent(student)
+                              ? [{ label: t("buttons.resend_invite"), onSelect: () => handleResendInvite(pendingParent(student)!.id) }]
+                              : []),
+                            { label: t("buttons.delete"), onSelect: () => handleDeleteAction(student.id), danger: true },
+                          ]}
                         />
                       </TableCell>
                     </TableRow>

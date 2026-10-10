@@ -35,9 +35,9 @@ export const useHomeworkController = () => {
   };
 
   const academicYears = useGetAcademicYears(organizationId);
-  const classes = useGetClasses(organizationId, academicYearId);
-  const sections = useGetSections(organizationId, classId);
-  const subjects = useGetSubjects(organizationId, academicYearId);
+  const classes = useGetClasses(organizationId, academicYearId, "active");
+  const sections = useGetSections(organizationId, classId, "active");
+  const subjects = useGetSubjects(organizationId, academicYearId, "active");
   const homeworkList = useGetHomeworkList(organizationId, sectionId);
 
   const createHomework = useCreateHomework(organizationId, sectionId);

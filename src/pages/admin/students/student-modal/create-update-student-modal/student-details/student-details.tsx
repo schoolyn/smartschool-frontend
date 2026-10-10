@@ -17,8 +17,8 @@ const StudentDetailsForm = ({ t, organizationId, form, isEditStudent }: IStudent
   const academicYearId = form.watch("academicYearId");
   const classId = form.watch("classId");
   const academicYears = useGetAcademicYears(organizationId);
-  const classes = useGetClasses(organizationId, academicYearId);
-  const sections = useGetSections(organizationId, classId);
+  const classes = useGetClasses(organizationId, academicYearId, "active");
+  const sections = useGetSections(organizationId, classId, "active");
 
   return (
     <>
@@ -63,7 +63,7 @@ const StudentDetailsForm = ({ t, organizationId, form, isEditStudent }: IStudent
           {isEditStudent ? (
             <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-600">
               <p className="font-medium text-gray-700 mb-1">Class / Section / Roll No.</p>
-              <p>Current: {classId ? "assigned" : "unassigned"} — use Promote/Transfer to change enrollment.</p>
+              <p>Current: {classId ? "assigned" : "unassigned"}, use Promote/Transfer to change enrollment.</p>
             </div>
           ) : (
             <>

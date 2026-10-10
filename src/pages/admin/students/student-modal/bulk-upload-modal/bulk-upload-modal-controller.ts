@@ -15,8 +15,8 @@ const useBulkUploadModalController = (organizationId: string, onImported: () => 
   const classId = form.watch("classId");
 
   const academicYears = useGetAcademicYears(organizationId);
-  const classes = useGetClasses(organizationId, academicYearId);
-  const sections = useGetSections(organizationId, classId);
+  const classes = useGetClasses(organizationId, academicYearId, "active");
+  const sections = useGetSections(organizationId, classId, "active");
   const bulkImport = useBulkImportStudents(organizationId);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

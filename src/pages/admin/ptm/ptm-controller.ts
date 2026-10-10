@@ -32,7 +32,7 @@ const usePTMController = () => {
 
   const getAcademicYears = useGetAcademicYears(org);
   const currentAcademicYearId = getAcademicYears.data?.items.find((y) => y.isCurrent)?.id;
-  const getClasses = useGetClasses(org, currentAcademicYearId);
+  const getClasses = useGetClasses(org, currentAcademicYearId, "active");
   const getSections = useGetSections(org, undefined);
   const getTeacherAssignments = useGetTeacherAssignments(org);
 

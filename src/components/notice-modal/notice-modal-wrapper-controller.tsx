@@ -36,9 +36,9 @@ const useNoticeModalWrapperController = (
 
   const getAcademicYears = useGetAcademicYears(organizationId || "");
   const currentAcademicYearId = getAcademicYears.data?.items.find((y) => y.isCurrent)?.id;
-  const getClasses = useGetClasses(organizationId || "", currentAcademicYearId);
+  const getClasses = useGetClasses(organizationId || "", currentAcademicYearId, "active");
   const classOptions = getClasses.data?.items || [];
-  const getSections = useGetSections(organizationId || "", sectionPickerClassId || undefined);
+  const getSections = useGetSections(organizationId || "", sectionPickerClassId || undefined, "active");
   const sectionOptions = getSections.data?.items || [];
 
   const roleOptions = ["SCHOOL_ADMIN", "TEACHER", "PARENT", "STAFF"];

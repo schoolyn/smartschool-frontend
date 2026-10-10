@@ -1,152 +1,195 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import apiClient from "@/config";
-import {
-  IAPIError,
-  IAxiosResponse,
-  IAcademicYear,
-  IClass,
-  ISection,
-  ISubject,
-  ITeacherAssignment,
-} from "@/types";
+import { IAPIError, IAxiosResponse, IAcademicYear, IClass, ISection, ISubject, ITeacherAssignment } from "@/types";
 import { APIS_ROUTES, API_QUERY_KEY, API_MUTATION_KEY } from "@/utils";
+
+type RecordStatus = "active" | "inactive";
 
 const base = (organizationId: string) => `${APIS_ROUTES.ACADEMIC_SERVICE}/${organizationId}`;
 
-// academic years
+const getItems = async <T>(url: string, params?: object) => {
+  const result = await apiClient.get<null, IAxiosResponse<{ items: T[] }>>(url, { params });
+  return result.data.Data;
+};
+
+// A mutation that, once it succeeds, refreshes the lists it can have changed. Changing a class also changes the counts
+// shown for its sections (and the other way round), so related lists are refreshed together.
+const useRefreshingMutation = <TVariables>(
+  organizationId: string,
+  mutationKey: string,
+  mutationFn: (variables: TVariables) => Promise<unknown>,
+  refresh: string[],
+) => {
+  const queryClient = useQueryClient();
+  return useMutation<void, IAPIError, TVariables>({
+    mutationKey: [mutationKey],
+    mutationFn: async (variables) => {
+      await mutationFn(variables);
+    },
+    onSuccess: () =>
+      Promise.all(refresh.map((key) => queryClient.invalidateQueries({ queryKey: [key, organizationId] }))),
+  });
+};
+
+// ── academic years ──
+
 export const useGetAcademicYears = (organizationId: string) =>
   useQuery<{ items: IAcademicYear[] }, IAPIError>({
     queryKey: [API_QUERY_KEY.GET_ACADEMIC_YEARS, organizationId],
-    queryFn: async () => {
-      const result = await apiClient.get<null, IAxiosResponse<{ items: IAcademicYear[] }>>(
-        `${base(organizationId)}/academic-year`
-      );
-      return result.data.Data;
-    },
+    queryFn: () => getItems<IAcademicYear>(`${base(organizationId)}/academic-year`),
     enabled: !!organizationId,
   });
 
-export const useCreateAcademicYear = (organizationId: string) => {
-  const queryClient = useQueryClient();
-  return useMutation<void, IAPIError, Partial<IAcademicYear>>({
-    mutationKey: [API_MUTATION_KEY.CREATE_ACADEMIC_YEAR],
-    mutationFn: async (value) => {
-      await apiClient.post(`${base(organizationId)}/academic-year`, value);
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [API_QUERY_KEY.GET_ACADEMIC_YEARS, organizationId] }),
-  });
-};
+export const useCreateAcademicYear = (organizationId: string) =>
+  useRefreshingMutation<Partial<IAcademicYear>>(
+    organizationId,
+    API_MUTATION_KEY.CREATE_ACADEMIC_YEAR,
+    (value) => apiClient.post(`${base(organizationId)}/academic-year`, value),
+    [API_QUERY_KEY.GET_ACADEMIC_YEARS],
+  );
 
-// classes
-export const useGetClasses = (organizationId: string, academicYearId?: string) =>
+export const useUpdateAcademicYear = (organizationId: string) =>
+  useRefreshingMutation<{ id: string } & Partial<IAcademicYear>>(
+    organizationId,
+    API_MUTATION_KEY.UPDATE_ACADEMIC_YEAR,
+    ({ id, ...value }) => apiClient.put(`${base(organizationId)}/academic-year/${id}`, value),
+    [API_QUERY_KEY.GET_ACADEMIC_YEARS],
+  );
+
+// ── classes ──
+
+export const useGetClasses = (organizationId: string, academicYearId?: string, status?: RecordStatus) =>
   useQuery<{ items: IClass[] }, IAPIError>({
-    queryKey: [API_QUERY_KEY.GET_CLASSES, organizationId, academicYearId],
-    queryFn: async () => {
-      const result = await apiClient.get<null, IAxiosResponse<{ items: IClass[] }>>(`${base(organizationId)}/class`, {
-        params: { academicYearId },
-      });
-      return result.data.Data;
-    },
+    queryKey: [API_QUERY_KEY.GET_CLASSES, organizationId, academicYearId, status],
+    queryFn: () => getItems<IClass>(`${base(organizationId)}/class`, { academicYearId, status }),
     enabled: !!organizationId && !!academicYearId,
   });
 
-export const useCreateClass = (organizationId: string) => {
-  const queryClient = useQueryClient();
-  return useMutation<void, IAPIError, Partial<IClass>>({
-    mutationKey: [API_MUTATION_KEY.CREATE_CLASS],
-    mutationFn: async (value) => {
-      await apiClient.post(`${base(organizationId)}/class`, value);
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [API_QUERY_KEY.GET_CLASSES, organizationId] }),
-  });
-};
+const CLASS_LISTS = [API_QUERY_KEY.GET_CLASSES, API_QUERY_KEY.GET_SECTIONS];
 
-// sections
-export const useGetSections = (organizationId: string, classId?: string) =>
+export const useCreateClass = (organizationId: string) =>
+  useRefreshingMutation<Partial<IClass>>(
+    organizationId,
+    API_MUTATION_KEY.CREATE_CLASS,
+    (value) => apiClient.post(`${base(organizationId)}/class`, value),
+    CLASS_LISTS,
+  );
+
+export const useUpdateClass = (organizationId: string) =>
+  useRefreshingMutation<{ id: string } & Partial<IClass>>(
+    organizationId,
+    API_MUTATION_KEY.UPDATE_CLASS,
+    ({ id, ...value }) => apiClient.put(`${base(organizationId)}/class/${id}`, value),
+    CLASS_LISTS,
+  );
+
+export const useDeactivateClass = (organizationId: string) =>
+  useRefreshingMutation<string>(
+    organizationId,
+    API_MUTATION_KEY.DEACTIVATE_CLASS,
+    (id) => apiClient.delete(`${base(organizationId)}/class/${id}`),
+    CLASS_LISTS,
+  );
+
+// ── sections ──
+
+export const useGetSections = (organizationId: string, classId?: string, status?: RecordStatus) =>
   useQuery<{ items: ISection[] }, IAPIError>({
-    queryKey: [API_QUERY_KEY.GET_SECTIONS, organizationId, classId],
-    queryFn: async () => {
-      const result = await apiClient.get<null, IAxiosResponse<{ items: ISection[] }>>(
-        `${base(organizationId)}/section`,
-        { params: { classId } }
-      );
-      return result.data.Data;
-    },
+    queryKey: [API_QUERY_KEY.GET_SECTIONS, organizationId, classId, status],
+    queryFn: () => getItems<ISection>(`${base(organizationId)}/section`, { classId, status }),
     enabled: !!organizationId && !!classId,
   });
 
-export const useCreateSection = (organizationId: string) => {
-  const queryClient = useQueryClient();
-  return useMutation<void, IAPIError, Partial<ISection>>({
-    mutationKey: [API_MUTATION_KEY.CREATE_SECTION],
-    mutationFn: async (value) => {
-      await apiClient.post(`${base(organizationId)}/section`, value);
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [API_QUERY_KEY.GET_SECTIONS, organizationId] }),
-  });
-};
+type SectionInput = Omit<Partial<ISection>, "classTeacherId"> & { classTeacherId?: string };
 
-// subjects
-export const useGetSubjects = (organizationId: string, academicYearId?: string) =>
+export const useCreateSection = (organizationId: string) =>
+  useRefreshingMutation<SectionInput>(
+    organizationId,
+    API_MUTATION_KEY.CREATE_SECTION,
+    (value) => apiClient.post(`${base(organizationId)}/section`, value),
+    CLASS_LISTS,
+  );
+
+export const useUpdateSection = (organizationId: string) =>
+  useRefreshingMutation<{ id: string } & SectionInput>(
+    organizationId,
+    API_MUTATION_KEY.UPDATE_SECTION,
+    ({ id, ...value }) => apiClient.put(`${base(organizationId)}/section/${id}`, value),
+    CLASS_LISTS,
+  );
+
+export const useDeactivateSection = (organizationId: string) =>
+  useRefreshingMutation<string>(
+    organizationId,
+    API_MUTATION_KEY.DEACTIVATE_SECTION,
+    (id) => apiClient.delete(`${base(organizationId)}/section/${id}`),
+    CLASS_LISTS,
+  );
+
+// ── subjects ──
+
+export const useGetSubjects = (organizationId: string, academicYearId?: string, status?: RecordStatus) =>
   useQuery<{ items: ISubject[] }, IAPIError>({
-    queryKey: [API_QUERY_KEY.GET_SUBJECTS, organizationId, academicYearId],
-    queryFn: async () => {
-      const result = await apiClient.get<null, IAxiosResponse<{ items: ISubject[] }>>(
-        `${base(organizationId)}/subject`,
-        { params: { academicYearId } }
-      );
-      return result.data.Data;
-    },
+    queryKey: [API_QUERY_KEY.GET_SUBJECTS, organizationId, academicYearId, status],
+    queryFn: () => getItems<ISubject>(`${base(organizationId)}/subject`, { academicYearId, status }),
     enabled: !!organizationId && !!academicYearId,
   });
 
-export const useCreateSubject = (organizationId: string) => {
-  const queryClient = useQueryClient();
-  return useMutation<void, IAPIError, Partial<ISubject>>({
-    mutationKey: [API_MUTATION_KEY.CREATE_SUBJECT],
-    mutationFn: async (value) => {
-      await apiClient.post(`${base(organizationId)}/subject`, value);
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [API_QUERY_KEY.GET_SUBJECTS, organizationId] }),
-  });
-};
+export const useCreateSubject = (organizationId: string) =>
+  useRefreshingMutation<Partial<ISubject>>(
+    organizationId,
+    API_MUTATION_KEY.CREATE_SUBJECT,
+    (value) => apiClient.post(`${base(organizationId)}/subject`, value),
+    [API_QUERY_KEY.GET_SUBJECTS],
+  );
 
-// teacher assignments
+export const useUpdateSubject = (organizationId: string) =>
+  useRefreshingMutation<{ id: string } & Partial<ISubject>>(
+    organizationId,
+    API_MUTATION_KEY.UPDATE_SUBJECT,
+    ({ id, ...value }) => apiClient.put(`${base(organizationId)}/subject/${id}`, value),
+    [API_QUERY_KEY.GET_SUBJECTS],
+  );
+
+export const useDeactivateSubject = (organizationId: string) =>
+  useRefreshingMutation<string>(
+    organizationId,
+    API_MUTATION_KEY.DEACTIVATE_SUBJECT,
+    (id) => apiClient.delete(`${base(organizationId)}/subject/${id}`),
+    [API_QUERY_KEY.GET_SUBJECTS],
+  );
+
+// ── teacher assignments ──
+
 export const useGetTeacherAssignments = (organizationId: string, classId?: string) =>
   useQuery<{ items: ITeacherAssignment[] }, IAPIError>({
     queryKey: [API_QUERY_KEY.GET_TEACHER_ASSIGNMENTS, organizationId, classId],
-    queryFn: async () => {
-      const result = await apiClient.get<null, IAxiosResponse<{ items: ITeacherAssignment[] }>>(
-        `${base(organizationId)}/teacher-assignment`,
-        { params: { classId } }
-      );
-      return result.data.Data;
-    },
+    queryFn: () => getItems<ITeacherAssignment>(`${base(organizationId)}/teacher-assignment`, { classId }),
     enabled: !!organizationId,
   });
 
-export const useAssignTeacher = (organizationId: string) => {
-  const queryClient = useQueryClient();
-  return useMutation<
-    void,
-    IAPIError,
-    {
-      teacherUserId: string;
-      academicYearId: string;
-      classId: string;
-      sectionId: string;
-      subjectId?: string;
-      assignmentRole: string;
-    }
-  >({
-    mutationKey: [API_MUTATION_KEY.ASSIGN_TEACHER],
-    mutationFn: async (value) => {
-      await apiClient.post(`${base(organizationId)}/teacher-assignment`, value);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [API_QUERY_KEY.GET_TEACHER_ASSIGNMENTS, organizationId] });
-      queryClient.invalidateQueries({ queryKey: [API_QUERY_KEY.GET_SECTIONS, organizationId] });
-    },
-  });
-};
+const ASSIGNMENT_LISTS = [API_QUERY_KEY.GET_TEACHER_ASSIGNMENTS, API_QUERY_KEY.GET_SECTIONS];
+
+export const useAssignTeacher = (organizationId: string) =>
+  useRefreshingMutation<{
+    teacherUserId: string;
+    academicYearId: string;
+    classId: string;
+    sectionId: string;
+    subjectId?: string;
+    assignmentRole: string;
+  }>(
+    organizationId,
+    API_MUTATION_KEY.ASSIGN_TEACHER,
+    (value) => apiClient.post(`${base(organizationId)}/teacher-assignment`, value),
+    ASSIGNMENT_LISTS,
+  );
+
+export const useRemoveTeacherAssignment = (organizationId: string) =>
+  useRefreshingMutation<string>(
+    organizationId,
+    API_MUTATION_KEY.REMOVE_TEACHER_ASSIGNMENT,
+    (id) => apiClient.delete(`${base(organizationId)}/teacher-assignment/${id}`),
+    ASSIGNMENT_LISTS,
+  );

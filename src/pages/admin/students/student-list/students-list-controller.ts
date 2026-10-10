@@ -68,7 +68,7 @@ const useStudentsListController = () => {
   const academicYears = useGetAcademicYears(organizationId || "");
   const currentAcademicYearId =
     academicYears.data?.items.find((y) => y.isCurrent)?.id || academicYears.data?.items[0]?.id || "";
-  const classesForFilter = useGetClasses(organizationId || "", currentAcademicYearId);
+  const classesForFilter = useGetClasses(organizationId || "", currentAcademicYearId, "active");
   const CLASS_OPTIONS = classesForFilter.data?.items || [];
 
   // Get current students for pagination
