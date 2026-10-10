@@ -98,7 +98,6 @@
     "all_classes": "सभी कक्षाएं",
     "your_profile": "आपकी प्रोफ़ाइल",
     "sign_out": "साइन आउट",
-    "notifications": "सूचनाएं",
     "mark_all_as_read": "सभी को पढ़ा हुआ चिह्नित करें",
     "no_notifications": "आप पूरी तरह अपडेट हैं",
     "manage_notices": "सूचनाएं प्रबंधित करें",
@@ -108,7 +107,23 @@
     "organization_name": "संगठन का नाम",
     "pincode": "पिनकोड",
     "description": "विवरण",
-    "not_provided": "उपलब्ध नहीं"
+    "not_provided": "उपलब्ध नहीं",
+    "sign_in_heading": "Opscul में साइन इन करें",
+    "sign_in_subtitle": "अपने स्कूल द्वारा दिया गया ईमेल और पासवर्ड उपयोग करें।",
+    "password": "पासवर्ड",
+    "show": "दिखाएं",
+    "hide": "छुपाएं",
+    "copyright": "© 2026 opscul.com",
+    "login_hero": "आपके पूरे स्कूल के लिए एक स्कूल OS।",
+    "login_panel_tag": "OPSCUL पर एक दिन",
+    "login_panel_title": "आपका स्टाफ एक काम करता है। हर अभिभावक तुरंत जान जाता है।",
+    "login_feature_attendance": "उपस्थिति",
+    "login_feature_homework": "होमवर्क",
+    "login_feature_notices": "सूचनाएं",
+    "login_feature_fees": "फीस",
+    "login_feature_results": "परिणाम",
+    "login_feature_mobile": "पैरेंट ऐप",
+    "invite_pending": "आमंत्रण लंबित"
   },
   "messages": {
     "enter_email_associate_with_account": "चिंता न करें! ऐसा होता है। कृपया अपने खाते से जुड़ा ईमेल पता दर्ज करें।",
@@ -150,7 +165,8 @@
     "no_record_found": "कोई रिकॉर्ड नहीं मिला। फ़िल्टर बदलें या नया उपयोगकर्ता जोड़ें।",
     "no_search_term_found": "\"{{entity}}\" से मेल खाता कोई रिकॉर्ड नहीं मिला। कोई भिन्न खोज शब्द आज़माएं या खोज साफ़ करें।",
     "notice_created_successfully": "सूचना सफलतापूर्वक बनाई गई।",
-    "organization_created_successfully": "संगठन सफलतापूर्वक बनाया गया।"
+    "organization_created_successfully": "संगठन सफलतापूर्वक बनाया गया।",
+    "invite_resent": "आमंत्रण दोबारा भेजा गया।"
   },
   "buttons": {
     "sending": "भेज रहा है",
@@ -175,7 +191,8 @@
     "clear_selection": "चयन साफ़ करें",
     "edit": "संपादित करें",
     "save": "सहेजें",
-    "preview": "पूर्वावलोकन"
+    "preview": "पूर्वावलोकन",
+    "resend_invite": "आमंत्रण दोबारा भेजें"
   },
   "common": {
     "notice_types": {

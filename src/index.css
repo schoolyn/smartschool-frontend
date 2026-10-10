@@ -302,3 +302,17 @@
     animation: none;
   }
 }
+
+/* login panel: LIVE dot pulse */
+@keyframes login-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.login-pulse {
+  animation: login-pulse 1.6s infinite;
+}

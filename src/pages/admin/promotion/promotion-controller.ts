@@ -31,8 +31,8 @@ export const usePromotionController = () => {
   const academicYears = useGetAcademicYears(organizationId);
   const sourceClasses = useGetClasses(organizationId, sourceAcademicYearId);
   const sourceSections = useGetSections(organizationId, sourceClassId);
-  const targetClasses = useGetClasses(organizationId, targetAcademicYearId);
-  const targetSections = useGetSections(organizationId, targetClassId);
+  const targetClasses = useGetClasses(organizationId, targetAcademicYearId, "active");
+  const targetSections = useGetSections(organizationId, targetClassId, "active");
 
   const candidates = useGetPromotionCandidates(organizationId, sourceAcademicYearId, sourceSectionId);
   const processPromotions = useProcessPromotions(organizationId);
@@ -117,7 +117,7 @@ export const usePromotionController = () => {
         setResultsByStudent(map);
         const failedCount = data.items.filter((r) => !r.success).length;
         if (failedCount === 0) toast.success("All students processed successfully.");
-        else toast.error(`${failedCount} of ${data.items.length} failed — see details below.`);
+        else toast.error(`${failedCount} of ${data.items.length} failed, see details below.`);
         candidates.refetch();
       },
       onError: (error) => {

@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updatePreferences = (partial: Partial<IUserPreferences>) => {
     setUser((prev) =>
-      prev ? { ...prev, preferences: { ...prev.preferences, ...partial } as IUserPreferences } : prev
+      prev ? { ...prev, preferences: { ...prev.preferences, ...partial } as IUserPreferences } : prev,
     );
   };
 
@@ -108,7 +108,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // a token cookie exists but we haven't yet confirmed it's still valid (page load / hard refresh) —
   // this is the ONLY place the full-page logo loader should show; every other loading state
   // in the app is a normal in-page spinner, not this one
-  const isCheckingSession = !!Cookies.get(USER_ACCESS_KEY.TOKEN) && getUserDetails.isLoading;
+  // it also covers the render between the server confirming the user and the effect above storing it, so route
+  // guards never see a signed-in visitor as signed out
+  const isCheckingSession =
+    !!Cookies.get(USER_ACCESS_KEY.TOKEN) && (getUserDetails.isLoading || (getUserDetails.isSuccess && !user));
 
   if (isCheckingSession) {
     return <LogoSpinner />;

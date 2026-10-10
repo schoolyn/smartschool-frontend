@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-import { useAuth } from "@/context/auth-context";
 import {
   useGetAccounts,
   useCreateAccount,
@@ -11,8 +10,6 @@ import {
 import { ICreateAccountValue, IAddOrganizationToAccountValue } from "@/types";
 
 export const usePlatformController = () => {
-  const { user } = useAuth();
-
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [addSchoolAccountId, setAddSchoolAccountId] = useState<string | null>(null);
 
@@ -26,7 +23,7 @@ export const usePlatformController = () => {
       toast.success(
         createAccount.data?.ownerInvited
           ? "Customer created — an invite email was sent to the owner."
-          : "Customer created — the existing owner now has access."
+          : "Customer created — the existing owner now has access.",
       );
       setIsCreateModalOpen(false);
     }
@@ -61,7 +58,6 @@ export const usePlatformController = () => {
   };
 
   return {
-    isPlatformAdmin: !!user?.isPlatformAdmin,
     accounts: accounts.data?.items || [],
     isLoading: accounts.isLoading,
     isCreateModalOpen,

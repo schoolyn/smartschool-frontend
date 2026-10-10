@@ -3,6 +3,7 @@ import useGetStudentDetails from "./get-student-details";
 import useUpdateStudentDetail from "./update-student-detail";
 import useGetStudentById from "./get-student-by-id";
 import useDeleteStudent from "./delete-student";
+import useReinviteParent from "./reinvite-parent";
 
 export {
   useAddStudent,
@@ -10,4 +11,5 @@ export {
   useUpdateStudentDetail,
   useGetStudentById,
   useDeleteStudent,
+  useReinviteParent,
 };

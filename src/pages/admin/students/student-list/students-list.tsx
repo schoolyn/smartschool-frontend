@@ -1,4 +1,4 @@
-import { EllipsisHorizontalIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import Spinner from "@/components/spinner";
 import NoRecordFound from "@/components/no-record-found";
@@ -13,6 +13,16 @@ import useStudentsListController from "./students-list-controller";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import CreateUpdateStudentModal from "../student-modal/create-update-student-modal";
 import BulkUploadModal from "../student-modal/bulk-upload-modal";
+import RowMenu from "@/components/row-menu";
+import { studentToCsvRow } from "../student-csv";
+
+// the parent of this student, when they were invited but have not set a password yet
+const pendingParent = (student: { parentId?: unknown }) => {
+  const parent = student.parentId;
+  return parent && typeof parent === "object" && (parent as { status?: string }).status === "pending"
+    ? (parent as { id: string })
+    : null;
+};
 
 const StudentsList = () => {
   const {
@@ -36,8 +46,6 @@ const StudentsList = () => {
     itemsPerPage,
     searchTerm,
     classFilter,
-    activeDropdown,
-    dropdownRef,
     isDeleteModalOpen,
     deleteStudentId,
     isLoadingAddStudent,
@@ -52,13 +60,12 @@ const StudentsList = () => {
     setCurrentStep,
     onClickAddStudent,
     paginate,
-    toggleDropdown,
     setSearchTerm,
-    setActiveDropdown,
     setClassFilter,
     handleClassFilterChange,
     handleDeleteAction,
     handleDeleteStudent,
+    handleResendInvite,
     onCancelDeleteModal,
     navigateToStudentDetails,
     onClickEditStudent,
@@ -67,13 +74,7 @@ const StudentsList = () => {
   const handleExportCsv = () => {
     exportToCsv(
       "students",
-      (studentDetail || []).map((student) => ({
-        name: student.name,
-        roll_number: student.currentEnrollment?.rollNumber ?? "",
-        class: student.currentEnrollment?.classId?.name ?? "",
-        section: student.currentEnrollment?.sectionId?.name ?? "",
-        date_of_birth: student.dateOfBirth,
-      }))
+      (studentDetail || []).map(studentToCsvRow)
     );
   };
 
@@ -197,6 +198,11 @@ const StudentsList = () => {
                             >
                               {student.name}
                             </div>
+                            {pendingParent(student) && (
+                              <span className="mt-0.5 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                                {t("labels.invite_pending")}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </TableCell>
@@ -211,54 +217,15 @@ const StudentsList = () => {
                         {new Date(student.dateOfBirth).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-center">
-                        <div
-                          className="relative inline-block text-center"
-                          ref={activeDropdown === student.id ? dropdownRef : undefined}
-                        >
-                          <button
-                            onClick={() => {
-                              toggleDropdown(student.id);
-                            }}
-                            className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                            aria-expanded={activeDropdown === student.id}
-                            aria-haspopup="true"
-                          >
-                            <EllipsisHorizontalIcon className="h-5 w-5" />
-                          </button>
-
-                          {/* Dropdown menu with improved positioning */}
-                          {activeDropdown === student.id && (
-                            <div
-                              className="absolute right-0 top-full mt-1 w-32 bg-white border rounded-lg shadow-lg overflow-hidden z-50"
-                              role="menu"
-                              aria-orientation="vertical"
-                              aria-labelledby="options-menu"
-                            >
-                              <div role="none">
-                                <button
-                                  className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  role="menuitem"
-                                  onMouseDown={() => {
-                                    onClickEditStudent(student.id);
-                                    setActiveDropdown(null);
-                                  }}
-                                >
-                                  {t("buttons.edit")}
-                                </button>
-                                <button
-                                  className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-                                  role="menuitem"
-                                  onMouseDown={() => {
-                                    handleDeleteAction(student.id);
-                                    setActiveDropdown(null);
-                                  }}
-                                >
-                                  {t("buttons.delete")}
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        <RowMenu
+                          items={[
+                            { label: t("buttons.edit"), onSelect: () => onClickEditStudent(student.id) },
+                            ...(pendingParent(student)
+                              ? [{ label: t("buttons.resend_invite"), onSelect: () => handleResendInvite(pendingParent(student)!.id) }]
+                              : []),
+                            { label: t("buttons.delete"), onSelect: () => handleDeleteAction(student.id), danger: true },
+                          ]}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

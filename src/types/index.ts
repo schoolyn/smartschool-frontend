@@ -388,6 +388,8 @@ export interface IClass {
   numericLevel?: number;
   sequence?: number;
   status: string;
+  sectionCount?: number;
+  studentCount?: number;
 }
 
 export interface ISection {
@@ -399,6 +401,7 @@ export interface ISection {
   roomNumber?: string;
   capacity?: number;
   status: string;
+  studentCount?: number;
 }
 
 export interface ISubject {
@@ -408,6 +411,7 @@ export interface ISubject {
   academicYearId: string;
   type: string;
   status: string;
+  applicableClassIds?: string[];
 }
 
 export interface ITeacherAssignment {

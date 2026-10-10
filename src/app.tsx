@@ -3,15 +3,13 @@ import { Toaster } from "react-hot-toast";
 
 import { AuthProvider } from "./context/auth-context";
 import { ThemeProvider } from "./context/theme-context";
-import Routes from "./routes";
+import router from "./routes";
 
 function App() {
-  const routes = Routes();
-
   return (
     <AuthProvider>
       <ThemeProvider>
-        <RouterProvider router={routes} />
+        <RouterProvider router={router} />
         <Toaster
           toastOptions={{
             duration: 4000,

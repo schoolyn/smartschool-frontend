@@ -1,90 +1,63 @@
 import { Link } from "react-router-dom";
 
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import BrandLogo from "@/components/brand-logo";
-import EyeON from "@/icons/eye-on-icon";
-import EyeOff from "@/icons/eye-off";
-import useLoginController from "./login-controller";
+import { PasswordInput } from "@/components/ui/password-input";
 import ButtonSpinner from "@/icons/button-spinner";
+import AuthHeading from "../components/auth-heading";
+import AuthLayout from "../components/auth-layout";
+import AuthSubmitButton from "../components/auth-submit-button";
+import useLoginController from "./login-controller";
 
 const Login = () => {
-  const { t, form, showPassword, isSigninLoading, setShowPassword, onSubmit } = useLoginController();
-  const email = form.watch("email");
-  const password = form.watch("password");
+  const { t, form, isSigninLoading, onSubmit } = useLoginController();
+  const isFilled = !!form.watch("email") && !!form.watch("password");
 
   return (
-    <div className="min-h-screen flex items-center justify-center flex-col bg-gray-100">
-      <BrandLogo className="h-11 w-auto mb-6" />
-      <div className="max-w-sm w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <div>
-          <h2 className="mt-2 text-xl font-bold text-gray-900">{t("labels.welcome")}</h2>
-          <span className="text-xs text-gray-600">{t("labels.sign_in_to_your_account")}</span>
-        </div>
+    <AuthLayout showBanner>
+      <AuthHeading title={t("labels.sign_in_heading")} subtitle={t("labels.sign_in_subtitle")} />
 
-        <Form {...form}>
-          <form className="mt-8 space-y-6" onSubmit={onSubmit} noValidate>
-            <div className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input {...field} id="email" type="email" placeholder="Email address" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+      <Form {...form}>
+        <form className="mt-6 space-y-5" onSubmit={onSubmit} noValidate>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="mb-1.5">{t("labels.email")}</FormLabel>
+                <FormControl>
+                  <Input {...field} type="email" autoComplete="email" placeholder="name@school.com" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="relative">
-                      <FormControl>
-                        <Input
-                          {...field}
-                          id="password"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Password"
-                          className="pr-10"
-                        />
-                      </FormControl>
-                      <button
-                        type="button"
-                        className="absolute inset-y-0 right-0 pr-3 pl-3 flex items-center"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeON /> : <EyeOff />}
-                      </button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <FormLabel className="mb-0">{t("labels.password")}</FormLabel>
+                  <Link to="/forgot-password" className="text-sm text-gray-600 hover:text-gray-900">
+                    {t("labels.forgot_password?")}
+                  </Link>
+                </div>
+                <FormControl>
+                  <PasswordInput {...field} autoComplete="current-password" placeholder="Password" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="text-xs text-right text-primary-600">
-              <Link to="/forgot-password">{t("labels.forgot_password?")}</Link>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
-                  email && password ? "" : "opacity-50 cursor-not-allowed"
-                }`}
-              >
-                {isSigninLoading ? <ButtonSpinner /> : t("buttons.sign_in")}
-              </button>
-            </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+          <AuthSubmitButton dimmed={!isFilled}>
+            {isSigninLoading ? <ButtonSpinner /> : t("buttons.sign_in")}
+          </AuthSubmitButton>
+        </form>
+      </Form>
+    </AuthLayout>
   );
 };
 
