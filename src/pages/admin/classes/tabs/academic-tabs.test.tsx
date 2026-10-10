@@ -27,6 +27,8 @@ vi.mock("../service/academics-service", () => ({
   useGetAcademicYears: () => hooks.years,
   useCreateAcademicYear: () => hooks.createYear,
   useUpdateAcademicYear: () => hooks.updateYear,
+  useGetRolloverPreview: () => ({ data: undefined, isLoading: false }),
+  useRolloverAcademicYear: () => ({ mutate: vi.fn(), isPending: false }),
   useGetClasses: (...args: unknown[]) => {
     hooks.getClasses(...args);
     return hooks.classes;
@@ -96,15 +98,15 @@ describe("YearsTab", () => {
     render(<YearsTab organizationId="org" />);
 
     await openMenu("2026-27");
-    expect(menuItems()).toEqual(["Edit"]);
+    expect(menuItems()).toEqual(["Edit", "Start next year from this one"]);
     await userEvent.keyboard("{Escape}");
 
     await openMenu("2025-26");
-    expect(menuItems()).toEqual(["Edit", "Set as current", "Close year"]);
+    expect(menuItems()).toEqual(["Edit", "Start next year from this one", "Set as current", "Close year"]);
     await userEvent.keyboard("{Escape}");
 
     await openMenu("2024-25");
-    expect(menuItems()).toEqual(["Edit", "Reopen year"]);
+    expect(menuItems()).toEqual(["Edit", "Start next year from this one", "Reopen year"]);
   });
 
   it("asks before making a year current, and only then sends the change", async () => {

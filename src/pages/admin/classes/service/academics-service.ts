@@ -15,18 +15,16 @@ const getItems = async <T>(url: string, params?: object) => {
 
 // A mutation that, once it succeeds, refreshes the lists it can have changed. Changing a class also changes the counts
 // shown for its sections (and the other way round), so related lists are refreshed together.
-const useRefreshingMutation = <TVariables>(
+const useRefreshingMutation = <TVariables, TResult = void>(
   organizationId: string,
   mutationKey: string,
-  mutationFn: (variables: TVariables) => Promise<unknown>,
+  mutationFn: (variables: TVariables) => Promise<TResult>,
   refresh: string[],
 ) => {
   const queryClient = useQueryClient();
-  return useMutation<void, IAPIError, TVariables>({
+  return useMutation<TResult, IAPIError, TVariables>({
     mutationKey: [mutationKey],
-    mutationFn: async (variables) => {
-      await mutationFn(variables);
-    },
+    mutationFn,
     onSuccess: () =>
       Promise.all(refresh.map((key) => queryClient.invalidateQueries({ queryKey: [key, organizationId] }))),
   });
@@ -55,6 +53,60 @@ export const useUpdateAcademicYear = (organizationId: string) =>
     API_MUTATION_KEY.UPDATE_ACADEMIC_YEAR,
     ({ id, ...value }) => apiClient.put(`${base(organizationId)}/academic-year/${id}`, value),
     [API_QUERY_KEY.GET_ACADEMIC_YEARS],
+  );
+
+export interface IRolloverPreview {
+  sourceYear: { id: string; name: string };
+  classes: { name: string; sections: string[] }[];
+  subjects: { name: string; code: string }[];
+  counts: { classes: number; sections: number; subjects: number };
+}
+
+export interface IRolloverRequest {
+  sourceYearId: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  copyClasses: boolean;
+  copySubjects: boolean;
+  isCurrent: boolean;
+}
+
+export interface IRolloverResult {
+  item: IAcademicYear;
+  copied: { classes: number; sections: number; subjects: number };
+}
+
+// what starting a new year from this one would copy, shown before anything is created
+export const useGetRolloverPreview = (organizationId: string, academicYearId?: string) =>
+  useQuery<IRolloverPreview, IAPIError>({
+    queryKey: [API_QUERY_KEY.GET_ROLLOVER_PREVIEW, organizationId, academicYearId],
+    queryFn: async () => {
+      const result = await apiClient.get<null, IAxiosResponse<IRolloverPreview>>(
+        `${base(organizationId)}/academic-year/${academicYearId}/rollover-preview`,
+      );
+      return result.data.Data;
+    },
+    enabled: !!organizationId && !!academicYearId,
+  });
+
+export const useRolloverAcademicYear = (organizationId: string) =>
+  useRefreshingMutation<IRolloverRequest, IRolloverResult>(
+    organizationId,
+    API_MUTATION_KEY.ROLLOVER_ACADEMIC_YEAR,
+    async ({ sourceYearId, ...body }) => {
+      const result = await apiClient.post<null, IAxiosResponse<IRolloverResult>>(
+        `${base(organizationId)}/academic-year/${sourceYearId}/rollover`,
+        body,
+      );
+      return result.data.Data;
+    },
+    [
+      API_QUERY_KEY.GET_ACADEMIC_YEARS,
+      API_QUERY_KEY.GET_CLASSES,
+      API_QUERY_KEY.GET_SECTIONS,
+      API_QUERY_KEY.GET_SUBJECTS,
+    ],
   );
 
 // ── classes ──

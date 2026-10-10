@@ -15,6 +15,7 @@ import { IAcademicYear } from "@/types";
 import { useCreateAcademicYear, useGetAcademicYears, useUpdateAcademicYear } from "../service/academics-service";
 import { defaultYearFormValues, yearFormSchema, YearFormValues } from "../classes.schema";
 import { TextField } from "../components/form-fields";
+import RolloverDialog from "../components/rollover-dialog";
 import Toolbar, { PrimaryButton } from "../components/toolbar";
 
 type YearAction = "current" | "close" | "reopen";
@@ -47,6 +48,7 @@ const YearsTab = ({ organizationId }: { organizationId: string }) => {
 
   const [dialog, setDialog] = useState<{ year?: IAcademicYear } | null>(null);
   const [pending, setPending] = useState<{ action: YearAction; year: IAcademicYear } | null>(null);
+  const [rolloverFrom, setRolloverFrom] = useState<IAcademicYear | null>(null);
 
   const form = useForm<YearFormValues>({ resolver: zodResolver(yearFormSchema), defaultValues: defaultYearFormValues });
 
@@ -99,6 +101,7 @@ const YearsTab = ({ organizationId }: { organizationId: string }) => {
 
   const menuFor = (year: IAcademicYear): RowMenuItem[] => [
     { label: "Edit", onSelect: () => setDialog({ year }) },
+    { label: "Start next year from this one", onSelect: () => setRolloverFrom(year) },
     ...(!year.isCurrent && year.status !== "closed"
       ? [{ label: "Set as current", onSelect: () => setPending({ action: "current" as const, year }) }]
       : []),
@@ -115,7 +118,18 @@ const YearsTab = ({ organizationId }: { organizationId: string }) => {
 
   return (
     <div className="rounded-lg bg-white shadow">
-      <Toolbar title="Academic years">{items.length > 0 && addButton}</Toolbar>
+      <Toolbar title="Academic years">
+        {items.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setRolloverFrom(items.find((year) => year.isCurrent) ?? items[0])}
+            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          >
+            Start next year
+          </button>
+        )}
+        {items.length > 0 && addButton}
+      </Toolbar>
 
       {years.isLoading ? (
         <Spinner />
@@ -179,6 +193,13 @@ const YearsTab = ({ organizationId }: { organizationId: string }) => {
           </label>
         )}
       </FormDialog>
+
+      <RolloverDialog
+        organizationId={organizationId}
+        years={items}
+        sourceYear={rolloverFrom}
+        onClose={() => setRolloverFrom(null)}
+      />
 
       <DeleteConfirmationDialog
         open={!!pending}

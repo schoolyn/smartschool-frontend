@@ -41,7 +41,14 @@ export const SelectField = <T extends FieldValues>({
   options,
   placeholder = "Select",
   disabled,
-}: FieldProps<T> & { options: SelectOption[]; placeholder?: string; disabled?: boolean }) => (
+  onValueChange,
+}: FieldProps<T> & {
+  options: SelectOption[];
+  placeholder?: string;
+  disabled?: boolean;
+  // called with the chosen id after the form value has been updated
+  onValueChange?: (id: string) => void;
+}) => (
   <FormField
     control={form.control}
     name={name}
@@ -54,7 +61,10 @@ export const SelectField = <T extends FieldValues>({
             disabled={disabled}
             options={options}
             value={options.find((option) => String(option.id) === field.value) ?? null}
-            onChange={(option) => field.onChange(String(option.id))}
+            onChange={(option) => {
+              field.onChange(String(option.id));
+              onValueChange?.(String(option.id));
+            }}
           />
         </FormControl>
         <FormMessage />

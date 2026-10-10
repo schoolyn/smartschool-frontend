@@ -24,6 +24,22 @@ export const yearFormSchema = z
 export type YearFormValues = z.infer<typeof yearFormSchema>;
 export const defaultYearFormValues: YearFormValues = { name: "", startDate: "", endDate: "", isCurrent: false };
 
+export const rolloverFormSchema = z
+  .object({
+    sourceYearId: z.string().min(1, "Choose the year to copy from."),
+    name: z.string().trim().min(1, "Name is required."),
+    startDate: z.string().trim().min(1, "Start date is required."),
+    endDate: z.string().trim().min(1, "End date is required."),
+    copyClasses: z.boolean(),
+    copySubjects: z.boolean(),
+    isCurrent: z.boolean(),
+  })
+  .refine((data) => !data.startDate || !data.endDate || data.endDate > data.startDate, {
+    message: "The end date must be after the start date.",
+    path: ["endDate"],
+  });
+export type RolloverFormValues = z.infer<typeof rolloverFormSchema>;
+
 export const classFormSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
   numericLevel: optionalPositiveInteger("Level"),
