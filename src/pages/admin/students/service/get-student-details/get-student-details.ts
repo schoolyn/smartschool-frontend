@@ -8,8 +8,12 @@ interface IStudentResponse {
   id: string;
   name: string;
   currentEnrollment: IStudentEnrollment | null;
-  parentId: string;
+  parentId: string | { name?: string; email?: string; phoneNumber?: string } | null;
   dateOfBirth: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
 }
 
 const getStudentDetails = async (

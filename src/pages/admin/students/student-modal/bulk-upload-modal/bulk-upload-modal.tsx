@@ -1,10 +1,11 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 import { Input } from "@/components/ui/input";
 import ButtonSpinner from "@/icons/button-spinner";
 import CustomSelectDropdown from "@/components/custom-select";
 import useBulkUploadModalController from "./bulk-upload-modal-controller";
 import { SelectOption } from "@/types";
+import { downloadStudentSampleCsv, STUDENT_CSV_OPTIONAL, STUDENT_CSV_REQUIRED } from "../../student-csv";
 
 interface BulkUploadModalProps {
   isOpen: boolean;
@@ -37,12 +38,28 @@ const BulkUploadModal = ({ isOpen, organizationId, onClose, onImported }: BulkUp
 
           <div className="p-4 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-1">Bulk Upload Students (CSV)</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              Choose the class and section these students belong to, then upload a CSV with columns:{" "}
-              <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
-                name, dateOfBirth, rollNumber, parentEmail, parentName, phoneNumber, address, city, state, pincode
-              </code>
+            <p className="text-sm text-gray-500 mb-3">
+              Choose the class and section these students belong to, then upload a CSV file.
             </p>
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 mb-4 text-sm text-gray-600 space-y-2">
+              <p>
+                <span className="font-medium text-gray-800">Required:</span>{" "}
+                <code className="text-xs">{STUDENT_CSV_REQUIRED.join(", ")}</code>
+              </p>
+              <p>
+                <span className="font-medium text-gray-800">Optional:</span>{" "}
+                <code className="text-xs">{STUDENT_CSV_OPTIONAL.join(", ")}</code>
+              </p>
+              <p>Dates use YYYY-MM-DD (for example 2015-06-21). Each roll number must be unique within the section.</p>
+              <button
+                type="button"
+                onClick={downloadStudentSampleCsv}
+                className="inline-flex items-center gap-1 font-medium text-primary-600 hover:text-primary-700"
+              >
+                <ArrowDownTrayIcon className="h-4 w-4" />
+                Download sample CSV
+              </button>
+            </div>
 
             {!c.result ? (
               <form onSubmit={c.handleSubmit} className="space-y-4 text-left">

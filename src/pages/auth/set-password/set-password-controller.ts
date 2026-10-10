@@ -14,7 +14,6 @@ const useSetPasswordController = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
 
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const form = useForm<SetPasswordFormValues>({
@@ -37,7 +36,7 @@ const useSetPasswordController = () => {
         onError: (err) => {
           setError(err?.response?.Error?.message || "Something went wrong. Please try again.");
         },
-      }
+      },
     );
   });
 
@@ -45,10 +44,8 @@ const useSetPasswordController = () => {
     t,
     form,
     hasToken: !!token,
-    showPassword,
     error,
     isLoading: setUserPassword.isPending,
-    setShowPassword,
     onSubmit,
   };
 };

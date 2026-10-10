@@ -1,4 +1,3 @@
-import { Navigate } from "react-router-dom";
 import { PlusIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
 
 import Spinner from "@/components/spinner";
@@ -14,10 +13,6 @@ const statusBadgeClass: Record<string, string> = {
 
 const Platform = () => {
   const c = usePlatformController();
-
-  if (!c.isPlatformAdmin) {
-    return <Navigate to="/not-access" replace />;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">

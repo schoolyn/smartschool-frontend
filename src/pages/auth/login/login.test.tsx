@@ -27,7 +27,7 @@ const renderLogin = () => {
       <MemoryRouter>
         <Login />
       </MemoryRouter>
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
 };
 
@@ -36,8 +36,8 @@ describe("Login", () => {
     renderLogin();
     const user = userEvent.setup();
 
-    await user.type(screen.getByPlaceholderText("Email address"), "not-an-email");
-    await user.type(screen.getByPlaceholderText("Password"), "secret");
+    await user.type(screen.getByLabelText("labels.email"), "not-an-email");
+    await user.type(screen.getByLabelText("labels.password"), "secret");
     await user.click(screen.getByRole("button", { name: "buttons.sign_in" }));
 
     expect(await screen.findByText("Enter a valid email address.")).toBeInTheDocument();
@@ -48,12 +48,10 @@ describe("Login", () => {
     renderLogin();
     const user = userEvent.setup();
 
-    await user.type(screen.getByPlaceholderText("Email address"), "admin@school.test");
-    await user.type(screen.getByPlaceholderText("Password"), "secret123");
+    await user.type(screen.getByLabelText("labels.email"), "admin@school.test");
+    await user.type(screen.getByLabelText("labels.password"), "secret123");
     await user.click(screen.getByRole("button", { name: "buttons.sign_in" }));
 
-    await waitFor(() =>
-      expect(mutate).toHaveBeenCalledWith({ email: "admin@school.test", password: "secret123" })
-    );
+    await waitFor(() => expect(mutate).toHaveBeenCalledWith({ email: "admin@school.test", password: "secret123" }));
   });
 });

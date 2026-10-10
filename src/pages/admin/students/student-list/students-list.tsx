@@ -13,6 +13,7 @@ import useStudentsListController from "./students-list-controller";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import CreateUpdateStudentModal from "../student-modal/create-update-student-modal";
 import BulkUploadModal from "../student-modal/bulk-upload-modal";
+import { studentToCsvRow } from "../student-csv";
 
 const StudentsList = () => {
   const {
@@ -67,13 +68,7 @@ const StudentsList = () => {
   const handleExportCsv = () => {
     exportToCsv(
       "students",
-      (studentDetail || []).map((student) => ({
-        name: student.name,
-        roll_number: student.currentEnrollment?.rollNumber ?? "",
-        class: student.currentEnrollment?.classId?.name ?? "",
-        section: student.currentEnrollment?.sectionId?.name ?? "",
-        date_of_birth: student.dateOfBirth,
-      }))
+      (studentDetail || []).map(studentToCsvRow)
     );
   };
 
