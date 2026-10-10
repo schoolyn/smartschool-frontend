@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { USER_ACCESS_KEY } from "@/utils";
+import { homePathFor, UserRole } from "@/routes/access";
 
 const NotAccess: React.FC = () => {
   const navigate = useNavigate();
@@ -11,8 +12,9 @@ const NotAccess: React.FC = () => {
   const organizationId = Cookies.get(USER_ACCESS_KEY.ORGANIZATION_ID);
 
   const handleGoToDashboard = () => {
-    if (token) {
-      navigate(`/${organizationId}/${userRole}/dashboard`);
+    // without a remembered school this goes to the school picker instead of a broken "/undefined/..." link
+    if (token && userRole) {
+      navigate(homePathFor(organizationId, userRole as UserRole));
     } else {
       navigate("/login");
     }

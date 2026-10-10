@@ -88,6 +88,8 @@ export const useGetRolloverPreview = (organizationId: string, academicYearId?: s
       return result.data.Data;
     },
     enabled: !!organizationId && !!academicYearId,
+    // checked right before copying, so it must reflect classes and subjects added since the last look
+    staleTime: 0,
   });
 
 export const useRolloverAcademicYear = (organizationId: string) =>
@@ -120,8 +122,11 @@ export const useGetClasses = (organizationId: string, academicYearId?: string, s
 
 const CLASS_LISTS = [API_QUERY_KEY.GET_CLASSES, API_QUERY_KEY.GET_SECTIONS];
 
+// null on edit clears an optional value
+type ClassInput = Omit<Partial<IClass>, "numericLevel"> & { numericLevel?: number | null };
+
 export const useCreateClass = (organizationId: string) =>
-  useRefreshingMutation<Partial<IClass>>(
+  useRefreshingMutation<ClassInput>(
     organizationId,
     API_MUTATION_KEY.CREATE_CLASS,
     (value) => apiClient.post(`${base(organizationId)}/class`, value),
@@ -129,7 +134,7 @@ export const useCreateClass = (organizationId: string) =>
   );
 
 export const useUpdateClass = (organizationId: string) =>
-  useRefreshingMutation<{ id: string } & Partial<IClass>>(
+  useRefreshingMutation<{ id: string } & ClassInput>(
     organizationId,
     API_MUTATION_KEY.UPDATE_CLASS,
     ({ id, ...value }) => apiClient.put(`${base(organizationId)}/class/${id}`, value),
@@ -153,14 +158,28 @@ export const useGetSections = (organizationId: string, classId?: string, status?
     enabled: !!organizationId && !!classId,
   });
 
-type SectionInput = Omit<Partial<ISection>, "classTeacherId"> & { classTeacherId?: string };
+// every section of a year, for screens that pick sections across classes
+export const useGetYearSections = (organizationId: string, academicYearId?: string, status: RecordStatus = "active") =>
+  useQuery<{ items: ISection[] }, IAPIError>({
+    queryKey: [API_QUERY_KEY.GET_SECTIONS, organizationId, "year", academicYearId, status],
+    queryFn: () => getItems<ISection>(`${base(organizationId)}/section`, { academicYearId, status }),
+    enabled: !!organizationId && !!academicYearId,
+  });
+
+type SectionInput = Omit<Partial<ISection>, "classTeacherId" | "capacity"> & {
+  classTeacherId?: string | null;
+  capacity?: number | null;
+};
+
+// the class teacher is stored as an assignment too, so section changes refresh that list
+const SECTION_LISTS = [...CLASS_LISTS, API_QUERY_KEY.GET_TEACHER_ASSIGNMENTS];
 
 export const useCreateSection = (organizationId: string) =>
   useRefreshingMutation<SectionInput>(
     organizationId,
     API_MUTATION_KEY.CREATE_SECTION,
     (value) => apiClient.post(`${base(organizationId)}/section`, value),
-    CLASS_LISTS,
+    SECTION_LISTS,
   );
 
 export const useUpdateSection = (organizationId: string) =>
@@ -168,7 +187,7 @@ export const useUpdateSection = (organizationId: string) =>
     organizationId,
     API_MUTATION_KEY.UPDATE_SECTION,
     ({ id, ...value }) => apiClient.put(`${base(organizationId)}/section/${id}`, value),
-    CLASS_LISTS,
+    SECTION_LISTS,
   );
 
 export const useDeactivateSection = (organizationId: string) =>
@@ -176,7 +195,7 @@ export const useDeactivateSection = (organizationId: string) =>
     organizationId,
     API_MUTATION_KEY.DEACTIVATE_SECTION,
     (id) => apiClient.delete(`${base(organizationId)}/section/${id}`),
-    CLASS_LISTS,
+    SECTION_LISTS,
   );
 
 // ── subjects ──
@@ -214,10 +233,10 @@ export const useDeactivateSubject = (organizationId: string) =>
 
 // ── teacher assignments ──
 
-export const useGetTeacherAssignments = (organizationId: string, classId?: string) =>
+export const useGetTeacherAssignments = (organizationId: string, academicYearId?: string) =>
   useQuery<{ items: ITeacherAssignment[] }, IAPIError>({
-    queryKey: [API_QUERY_KEY.GET_TEACHER_ASSIGNMENTS, organizationId, classId],
-    queryFn: () => getItems<ITeacherAssignment>(`${base(organizationId)}/teacher-assignment`, { classId }),
+    queryKey: [API_QUERY_KEY.GET_TEACHER_ASSIGNMENTS, organizationId, academicYearId],
+    queryFn: () => getItems<ITeacherAssignment>(`${base(organizationId)}/teacher-assignment`, { academicYearId }),
     enabled: !!organizationId,
   });
 

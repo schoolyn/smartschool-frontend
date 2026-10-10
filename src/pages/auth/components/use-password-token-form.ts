@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import type { UseMutationResult } from "@tanstack/react-query";
 
+import { useAuth } from "@/context/auth-context";
 import { IAPIError } from "@/types";
 import { passwordSchema, PasswordFormValues } from "./password.schema";
 
@@ -14,6 +15,7 @@ type PasswordMutation = UseMutationResult<void, IAPIError, { token: string; pass
 // link carrying a token, ask for a new password twice, and send the user to sign in afterwards
 export const usePasswordTokenForm = (mutation: PasswordMutation, successMessage: string) => {
   const navigate = useNavigate();
+  const { endSession } = useAuth();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
 
@@ -31,6 +33,8 @@ export const usePasswordTokenForm = (mutation: PasswordMutation, successMessage:
       { token, password: values.password },
       {
         onSuccess: () => {
+          // the server signs every device out after a password change, so any session left here is dropped too
+          endSession();
           toast.success(successMessage);
           navigate("/login");
         },

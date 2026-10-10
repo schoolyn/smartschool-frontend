@@ -30,7 +30,7 @@ const ROLE_OPTIONS = [
 const ROLE_LABELS: Record<string, string> = Object.fromEntries(ROLE_OPTIONS.map((role) => [role.id, role.name]));
 
 const AssignmentsTab = ({ organizationId, yearId }: { organizationId: string; yearId: string }) => {
-  const assignments = useGetTeacherAssignments(organizationId);
+  const assignments = useGetTeacherAssignments(organizationId, yearId);
   const teachers = useGetAllTeachers(organizationId);
   const classes = useGetClasses(organizationId, yearId, "active");
   const subjects = useGetSubjects(organizationId, yearId, "active");

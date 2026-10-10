@@ -7,7 +7,7 @@ import { useGetPTMEvents, useCreatePTMEvent, useGenerateSlots, useGetSlotsForEve
 import {
   useGetAcademicYears,
   useGetClasses,
-  useGetSections,
+  useGetYearSections,
   useGetTeacherAssignments,
 } from "../classes/service/academics-service";
 import { useError } from "@/hooks";
@@ -33,8 +33,8 @@ const usePTMController = () => {
   const getAcademicYears = useGetAcademicYears(org);
   const currentAcademicYearId = getAcademicYears.data?.items.find((y) => y.isCurrent)?.id;
   const getClasses = useGetClasses(org, currentAcademicYearId, "active");
-  const getSections = useGetSections(org, undefined);
-  const getTeacherAssignments = useGetTeacherAssignments(org);
+  const getSections = useGetYearSections(org, currentAcademicYearId);
+  const getTeacherAssignments = useGetTeacherAssignments(org, currentAcademicYearId);
 
   const getPTMEvents = useGetPTMEvents(org);
   const createPTMEvent = useCreatePTMEvent(org);

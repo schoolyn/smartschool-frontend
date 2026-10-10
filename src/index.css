@@ -316,3 +316,8 @@
 .login-pulse {
   animation: login-pulse 1.6s infinite;
 }
+@media (prefers-reduced-motion: reduce) {
+  .login-pulse {
+    animation: none;
+  }
+}

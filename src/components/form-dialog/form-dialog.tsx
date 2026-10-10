@@ -14,6 +14,8 @@ interface FormDialogProps<T extends FieldValues> {
   description?: string;
   submitLabel: string;
   isSubmitting?: boolean;
+  // blocks only the submit button, for example while data it depends on is still loading
+  submitDisabled?: boolean;
   onSubmit: FormEventHandler<HTMLFormElement>;
   children: ReactNode;
 }
@@ -28,6 +30,7 @@ const FormDialog = <T extends FieldValues>({
   description,
   submitLabel,
   isSubmitting = false,
+  submitDisabled = false,
   onSubmit,
   children,
 }: FormDialogProps<T>) => (
@@ -55,7 +58,7 @@ const FormDialog = <T extends FieldValues>({
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || submitDisabled}
               className="inline-flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 disabled:opacity-50"
             >
               {isSubmitting && <ButtonSpinner />}

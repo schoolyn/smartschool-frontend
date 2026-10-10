@@ -9,15 +9,16 @@ const student = {
   city: "Pune",
   state: "Maharashtra",
   pincode: "411001",
-  currentEnrollment: { rollNumber: "7" },
+  currentEnrollment: { rollNumber: "7", classId: { name: "Class 5" }, sectionId: { name: "A" } },
   parentId: { name: "Rohit Sharma", email: "rohit@example.com", phoneNumber: "9876543210" },
 };
 
 describe("studentToCsvRow", () => {
-  it("produces exactly the upload template columns, so an export can be re-imported", () => {
+  it("has every upload template column, so an export can be re-imported, plus class and section for reading", () => {
     expect(Object.keys(studentToCsvRow(student)).sort()).toEqual(
-      [...STUDENT_CSV_REQUIRED, ...STUDENT_CSV_OPTIONAL].sort(),
+      [...STUDENT_CSV_REQUIRED, ...STUDENT_CSV_OPTIONAL, "class", "section"].sort(),
     );
+    expect(studentToCsvRow(student)).toMatchObject({ class: "Class 5", section: "A" });
   });
 
   it("flattens the populated parent and enrollment", () => {

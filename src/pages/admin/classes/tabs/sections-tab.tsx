@@ -36,10 +36,16 @@ const NO_TEACHER = "none";
 
 const SectionsTab = ({ organizationId, yearId, classId, onClassChange }: SectionsTabProps) => {
   const [showInactive, setShowInactive] = useState(false);
-  const status = showInactive ? undefined : "active";
 
-  const classes = useGetClasses(organizationId, yearId, "active");
-  const sections = useGetSections(organizationId, classId, status);
+  // all classes load so an inactive one opened from the classes tab still shows its sections
+  const classes = useGetClasses(organizationId, yearId);
+  const allClasses = classes.data?.items ?? [];
+  const classOptions = allClasses.filter((klass) => klass.status === "active" || klass.id === classId);
+  const selectedClass = classOptions.find((klass) => klass.id === classId);
+  const classInactive = selectedClass?.status === "inactive";
+
+  // an inactive class only has inactive sections, so they show without the toggle
+  const sections = useGetSections(organizationId, classId, showInactive || classInactive ? undefined : "active");
   const teachers = useGetAllTeachers(organizationId);
   const createSection = useCreateSection(organizationId);
   const updateSection = useUpdateSection(organizationId);
@@ -53,7 +59,6 @@ const SectionsTab = ({ organizationId, yearId, classId, onClassChange }: Section
     defaultValues: defaultSectionFormValues,
   });
 
-  const classOptions = classes.data?.items ?? [];
   const teacherOptions = useMemo(
     () => [
       { id: NO_TEACHER, name: "No class teacher" },
@@ -86,18 +91,24 @@ const SectionsTab = ({ organizationId, yearId, classId, onClassChange }: Section
   useMutationFeedback(deactivateSection, "Section deactivated", () => setToDeactivate(null));
 
   const submit = form.handleSubmit((values) => {
-    const capacity = values.capacity ? Number(values.capacity) : undefined;
-    const classTeacherId = values.classTeacherId === NO_TEACHER ? undefined : values.classTeacherId;
-    const roomNumber = values.roomNumber || undefined;
+    const capacity = values.capacity ? Number(values.capacity) : null;
+    const classTeacherId = values.classTeacherId === NO_TEACHER ? null : values.classTeacherId;
 
     if (dialog?.section) {
-      updateSection.mutate({ id: dialog.section.id, name: values.name, capacity, roomNumber, classTeacherId });
+      // empty fields are sent as cleared so removing a capacity, room or teacher actually saves
+      updateSection.mutate({
+        id: dialog.section.id,
+        name: values.name,
+        capacity,
+        roomNumber: values.roomNumber,
+        classTeacherId,
+      });
     } else {
       createSection.mutate({
         name: values.name,
-        capacity,
-        roomNumber,
-        classTeacherId,
+        capacity: capacity ?? undefined,
+        roomNumber: values.roomNumber || undefined,
+        classTeacherId: classTeacherId ?? undefined,
         classId,
         academicYearId: yearId,
       });
@@ -112,7 +123,6 @@ const SectionsTab = ({ organizationId, yearId, classId, onClassChange }: Section
   ];
 
   const items = sections.data?.items ?? [];
-  const selectedClass = classOptions.find((klass) => klass.id === classId);
   const addButton = <PrimaryButton onClick={() => setDialog({})}>+ Add section</PrimaryButton>;
 
   return (
@@ -132,7 +142,7 @@ const SectionsTab = ({ organizationId, yearId, classId, onClassChange }: Section
         }
       >
         <ShowInactiveToggle checked={showInactive} onChange={setShowInactive} />
-        {classId && addButton}
+        {selectedClass && !classInactive && addButton}
       </Toolbar>
 
       {!classId ? (
@@ -146,7 +156,7 @@ const SectionsTab = ({ organizationId, yearId, classId, onClassChange }: Section
         <EmptyState
           title="No sections in this class"
           description="Add a section, such as A, and set how many students it can hold."
-          action={addButton}
+          action={classInactive ? undefined : addButton}
         />
       ) : (
         <div className="p-4">

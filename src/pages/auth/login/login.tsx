@@ -52,8 +52,9 @@ const Login = () => {
             )}
           />
 
-          <AuthSubmitButton dimmed={!isFilled}>
-            {isSigninLoading ? <ButtonSpinner /> : t("buttons.sign_in")}
+          <AuthSubmitButton dimmed={!isFilled} disabled={isSigninLoading}>
+            {isSigninLoading && <ButtonSpinner />}
+            {t("buttons.sign_in")}
           </AuthSubmitButton>
         </form>
       </Form>

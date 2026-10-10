@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 import { APIS_ROUTES, USER_ACCESS_KEY, authCookieOptions } from "../utils";
+import { isAuthPage } from "./auth-pages";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -14,9 +15,6 @@ const apiClient = axios.create({
 const refreshClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
-
-const AUTH_PAGES = ["/login", "/forgot-password"];
-const isAuthPage = () => AUTH_PAGES.includes(window.location.pathname);
 
 const formatApiError = (error: unknown) => ({
   status: get(error, "response.status"),

@@ -8,10 +8,12 @@ import ResetPassword from "../reset-password";
 import SetPassword from "../set-password";
 
 const mutate = vi.fn();
+const endSession = vi.fn();
 const hook = () => ({ mutate, isPending: false });
 
 vi.mock("../service", () => ({ useSetUserPassword: () => hook(), useResetUserPassword: () => hook() }));
 vi.mock("@/context/theme-context", () => ({ useTheme: () => ({ theme: "light" }) }));
+vi.mock("@/context/auth-context", () => ({ useAuth: () => ({ endSession }) }));
 vi.mock("react-hot-toast", () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 
 const renderAt = (path: string) =>
@@ -34,6 +36,7 @@ const fill = async (password: string, confirm = password) => {
 
 beforeEach(() => {
   mutate.mockReset();
+  endSession.mockClear();
   vi.mocked(toast.success).mockClear();
 });
 
@@ -70,6 +73,8 @@ describe("reset password page", () => {
       expect(mutate).toHaveBeenCalledWith({ token: "emailed-token", password: "Sunrise#2026" }, expect.any(Object)),
     );
     expect(toast.success).toHaveBeenCalledWith("Password reset successfully. You can now sign in.");
+    // an old session on this device is dropped, so sign-in shows instead of bouncing into that account
+    expect(endSession).toHaveBeenCalledTimes(1);
     expect(await screen.findByText("login page")).toBeInTheDocument();
   });
 
