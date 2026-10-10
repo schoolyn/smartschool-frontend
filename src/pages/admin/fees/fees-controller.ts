@@ -15,7 +15,7 @@ import {
   useGetPaymentLedger,
   useGrantConcession,
 } from "./service/fees-service";
-import { useGetAcademicYears, useGetClasses, useGetSections } from "../classes/service/academics-service";
+import { useGetAcademicYears, useGetClasses, useGetYearSections } from "../classes/service/academics-service";
 import useGetStudentDetails from "../students/service/get-student-details/get-student-details";
 import { useError } from "@/hooks";
 
@@ -57,7 +57,7 @@ const useFeesController = () => {
   const getAcademicYears = useGetAcademicYears(org);
   const currentAcademicYearId = getAcademicYears.data?.items.find((y) => y.isCurrent)?.id;
   const getClasses = useGetClasses(org, currentAcademicYearId, "active");
-  const getSections = useGetSections(org, undefined);
+  const getSections = useGetYearSections(org, currentAcademicYearId);
   const getFeeHeads = useGetFeeHeads(org);
   const getFeeStructures = useGetFeeStructures(org);
   const getStudentSearch = useGetStudentDetails(org, "all", studentSearch, 10, 1);
@@ -81,7 +81,13 @@ const useFeesController = () => {
   const feeHeads = getFeeHeads.data?.items || [];
   const feeStructures = getFeeStructures.data?.items || [];
   const classOptions = getClasses.data?.items || [];
-  const sectionOptions = getSections.data?.items || [];
+  // only sections of the ticked classes, named with their class since several classes have an "A"
+  const sectionOptions = (getSections.data?.items || [])
+    .filter((section) => classIds.includes(section.classId))
+    .map((section) => ({
+      ...section,
+      name: `${classOptions.find((c) => c.id === section.classId)?.name ?? ""} - ${section.name}`,
+    }));
   const studentSearchResults = getStudentSearch.data?.items || [];
   const studentFeeSummaries = getStudentFeeSummary.data?.items || [];
   const paymentLedger = getPaymentLedger.data?.items || [];
@@ -104,6 +110,13 @@ const useFeesController = () => {
   };
 
   const toggleClass = (classId: string) => {
+    if (classIds.includes(classId)) {
+      // unticking a class also drops any of its sections that were picked
+      const sectionsOfClass = new Set(
+        (getSections.data?.items || []).filter((section) => section.classId === classId).map((section) => section.id),
+      );
+      setSectionIds((prev) => prev.filter((id) => !sectionsOfClass.has(id)));
+    }
     setClassIds((prev) => (prev.includes(classId) ? prev.filter((c) => c !== classId) : [...prev, classId]));
   };
 

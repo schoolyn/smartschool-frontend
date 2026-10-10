@@ -67,7 +67,8 @@ const RolloverDialog = ({ organizationId, years, sourceYear, onClose }: Rollover
 
   const sourceYearId = form.watch("sourceYearId");
   const source = years.find((year) => year.id === sourceYearId);
-  const preview = useGetRolloverPreview(organizationId, sourceYearId || undefined);
+  // only fetched while the dialog is open, so reopening it always loads fresh counts
+  const preview = useGetRolloverPreview(organizationId, sourceYear ? sourceYearId || undefined : undefined);
 
   // each time the dialog opens: start from the chosen year, with the next year's name and dates suggested
   useEffect(() => {
@@ -90,9 +91,18 @@ const RolloverDialog = ({ organizationId, years, sourceYear, onClose }: Rollover
 
   useMutationFeedback(rollover, "New academic year started", onClose);
 
-  const submit = form.handleSubmit((values) => rollover.mutate(values));
+  const counts = preview.isFetching ? undefined : preview.data?.counts;
+  const countsDetail = (text: (c: NonNullable<typeof counts>) => string) =>
+    counts ? text(counts) : preview.isError ? "Could not load what this year has. Close and try again." : "Loading...";
 
-  const counts = preview.data?.counts;
+  // a box shown unticked because there is nothing to copy is sent as unticked too
+  const submit = form.handleSubmit((values) =>
+    rollover.mutate({
+      ...values,
+      copyClasses: values.copyClasses && !!counts?.classes,
+      copySubjects: values.copySubjects && !!counts?.subjects,
+    }),
+  );
   const copyClasses = form.watch("copyClasses");
   const copySubjects = form.watch("copySubjects");
 
@@ -105,6 +115,7 @@ const RolloverDialog = ({ organizationId, years, sourceYear, onClose }: Rollover
       description="Creates the new year and copies this year's setup into it, so you don't have to rebuild it by hand."
       submitLabel={`Start ${form.watch("name") || "new year"}`}
       isSubmitting={rollover.isPending}
+      submitDisabled={!counts}
       onSubmit={submit}
     >
       <SelectField
@@ -126,18 +137,16 @@ const RolloverDialog = ({ organizationId, years, sourceYear, onClose }: Rollover
         </p>
         <CheckRow
           label="Classes and sections"
-          detail={
-            counts
-              ? `${plural(counts.classes, "class", "classes")} with ${plural(counts.sections, "section")} (active ones only)`
-              : "Loading..."
-          }
+          detail={countsDetail(
+            (c) => `${plural(c.classes, "class", "classes")} with ${plural(c.sections, "section")} (active ones only)`,
+          )}
           checked={copyClasses}
           disabled={!counts?.classes}
           onChange={(checked) => form.setValue("copyClasses", checked)}
         />
         <CheckRow
           label="Subjects"
-          detail={counts ? `${plural(counts.subjects, "subject")} (active ones only)` : "Loading..."}
+          detail={countsDetail((c) => `${plural(c.subjects, "subject")} (active ones only)`)}
           checked={copySubjects}
           disabled={!counts?.subjects}
           onChange={(checked) => form.setValue("copySubjects", checked)}

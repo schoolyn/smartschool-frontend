@@ -28,16 +28,17 @@ const AdminClasses = () => {
 
   const years = useGetAcademicYears(organizationId);
   const yearList = useMemo(() => years.data?.items ?? [], [years.data]);
-  const classes = useGetClasses(organizationId, yearId, "active");
+  // inactive classes too, so "View sections" works on them (same query the sections tab uses)
+  const classes = useGetClasses(organizationId, yearId);
 
   // start on the current year (or the newest one) so every tab opens with something useful
   useEffect(() => {
     if (!yearId && yearList.length) setYearId((yearList.find((year) => year.isCurrent) ?? yearList[0]).id);
   }, [yearList, yearId]);
 
-  // a class from another year cannot stay selected; fall back to the first class of the chosen year
+  // a class from another year cannot stay selected; fall back to the first active class of the chosen year
   useEffect(() => {
-    const firstClass = classes.data?.items[0];
+    const firstClass = classes.data?.items.find((klass) => klass.status === "active");
     if (classes.data && !classes.data.items.some((klass) => klass.id === classId)) setClassId(firstClass?.id ?? "");
   }, [classes.data, classId]);
 

@@ -6,7 +6,7 @@ import RolloverDialog from "./rollover-dialog";
 
 const mutate = vi.fn();
 const state = vi.hoisted(() => ({
-  preview: { data: undefined as unknown, isLoading: false },
+  preview: { data: undefined as unknown, isLoading: false, isFetching: false, isError: false },
 }));
 
 vi.mock("../service/academics-service", () => ({
@@ -37,6 +37,8 @@ const years = [
 const preview = (counts: { classes: number; sections: number; subjects: number }) => ({
   data: { sourceYear: { id: "y1", name: "2026-27" }, classes: [], subjects: [], counts },
   isLoading: false,
+  isFetching: false,
+  isError: false,
 });
 
 const open = () =>
@@ -110,5 +112,30 @@ describe("RolloverDialog", () => {
 
     expect(await screen.findByText("The end date must be after the start date.")).toBeInTheDocument();
     expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it("does not ask to copy what does not exist: a disabled option is sent as not copied", async () => {
+    state.preview = preview({ classes: 0, sections: 0, subjects: 4 });
+    open();
+    await userEvent.click(screen.getByRole("button", { name: "Start 2027-28" }));
+
+    expect(mutate).toHaveBeenCalledWith(expect.objectContaining({ copyClasses: false, copySubjects: true }));
+  });
+
+  it("says so when the preview cannot load, and does not let the year start blind", () => {
+    state.preview = { data: undefined, isLoading: false, isFetching: false, isError: true };
+    open();
+
+    expect(screen.getAllByText("Could not load what this year has. Close and try again.")).toHaveLength(2);
+    expect(screen.getByRole("button", { name: "Start 2027-28" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeEnabled();
+  });
+
+  it("waits for fresh counts instead of showing old ones while they reload", () => {
+    state.preview = { ...preview({ classes: 3, sections: 6, subjects: 9 }), isFetching: true };
+    open();
+
+    expect(screen.queryByText(/3 classes/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start 2027-28" })).toBeDisabled();
   });
 });

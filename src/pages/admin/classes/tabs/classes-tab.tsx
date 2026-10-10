@@ -56,11 +56,11 @@ const ClassesTab = ({ organizationId, years, yearId, onYearChange, onViewSection
   useMutationFeedback(deactivateClass, "Class deactivated", () => setToDeactivate(null));
 
   const submit = form.handleSubmit((values) => {
-    const numericLevel = values.numericLevel ? Number(values.numericLevel) : undefined;
+    const numericLevel = values.numericLevel ? Number(values.numericLevel) : null;
     if (dialog?.klass) {
       updateClass.mutate({ id: dialog.klass.id, name: values.name, numericLevel });
     } else {
-      createClass.mutate({ name: values.name, numericLevel, academicYearId: yearId });
+      createClass.mutate({ name: values.name, numericLevel: numericLevel ?? undefined, academicYearId: yearId });
     }
   });
 

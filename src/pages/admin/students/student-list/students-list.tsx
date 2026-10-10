@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import toast from "react-hot-toast";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import Spinner from "@/components/spinner";
@@ -71,11 +73,18 @@ const StudentsList = () => {
     onClickEditStudent,
   } = useStudentsListController();
 
+  // the header keeps the buttons it was given on first render, so the export reads the list through a ref to
+  // always get the students currently shown rather than the empty list from before they loaded
+  const shownStudents = useRef(studentDetail);
+  shownStudents.current = studentDetail;
+
   const handleExportCsv = () => {
-    exportToCsv(
-      "students",
-      (studentDetail || []).map(studentToCsvRow)
-    );
+    const rows = (shownStudents.current || []).map(studentToCsvRow);
+    if (!rows.length) {
+      toast.error("There are no students to export.");
+      return;
+    }
+    exportToCsv("students", rows);
   };
 
   usePageHeader({

@@ -69,7 +69,7 @@ const ForgotPassword: React.FC = () => {
             </div>
           )}
 
-          <AuthSubmitButton dimmed={!captchaToken}>
+          <AuthSubmitButton dimmed={!captchaToken} disabled={isLoading}>
             {isLoading ? t("buttons.sending") : t("buttons.reset_password")}
           </AuthSubmitButton>
 

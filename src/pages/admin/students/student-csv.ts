@@ -49,12 +49,19 @@ interface ExportableStudent {
   city?: string;
   state?: string;
   pincode?: string;
-  currentEnrollment?: { rollNumber?: string } | null;
+  currentEnrollment?: {
+    rollNumber?: string;
+    classId?: string | { name?: string } | null;
+    sectionId?: string | { name?: string } | null;
+  } | null;
   parentId?: string | { name?: string; email?: string; phoneNumber?: string } | null;
 }
 
-// same headers as the upload template, so an exported file can be edited and uploaded back
-export const studentToCsvRow = (student: ExportableStudent): CsvRow => {
+const nameOf = (value?: string | { name?: string } | null) => (value && typeof value === "object" ? value.name ?? "" : "");
+
+// same headers as the upload template, so an exported file can be edited and uploaded back. class and section come
+// last for reading only: an upload takes them from the screen, and ignores these columns
+export const studentToCsvRow = (student: ExportableStudent): CsvRow & { class: string; section: string } => {
   const parent = student.parentId && typeof student.parentId === "object" ? student.parentId : null;
   return {
     name: student.name,
@@ -67,5 +74,7 @@ export const studentToCsvRow = (student: ExportableStudent): CsvRow => {
     city: student.city ?? "",
     state: student.state ?? "",
     pincode: student.pincode ?? "",
+    class: nameOf(student.currentEnrollment?.classId),
+    section: nameOf(student.currentEnrollment?.sectionId),
   };
 };

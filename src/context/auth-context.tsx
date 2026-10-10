@@ -5,6 +5,7 @@ import { APIS_ROUTES, USER_ACCESS_KEY, authCookieOptions } from "../utils";
 import { ILoginResponse, IUserAvatar, IUserPreferences } from "../types";
 import LogoSpinner from "../components/logo-spinner";
 import apiClient from "../config/api-client";
+import { isAuthPage } from "../config/auth-pages";
 
 type User = {
   name?: string;
@@ -27,6 +28,8 @@ type User = {
 interface IAuthContext {
   login: (data: ILoginResponse) => void;
   logout: () => void;
+  // forgets the session on this device without leaving the page, for example after a password reset
+  endSession: () => void;
   user: User;
   // merges a partial preferences update into the current user in place — the one
   // source of truth for "what does this user have set right now", so consumers
@@ -36,6 +39,12 @@ interface IAuthContext {
   updateAvatar: (avatar: IUserAvatar) => void;
   updateProfile: (partial: { name?: string; phoneNumber?: string }) => void;
 }
+
+const clearSessionCookies = () => {
+  Cookies.remove(USER_ACCESS_KEY.TOKEN);
+  Cookies.remove(USER_ACCESS_KEY.REFRESH_TOKEN);
+  Cookies.remove(USER_ACCESS_KEY.ROLE);
+};
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
@@ -67,12 +76,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser((prev) => (prev ? { ...prev, ...partial } : prev));
   };
 
+  const endSession = () => {
+    clearSessionCookies();
+    setUser(null);
+  };
+
   const logout = () => {
     // best-effort session revocation — clear local cookies regardless of outcome
     apiClient.post(APIS_ROUTES.LOGOUT).catch(() => {});
-    Cookies.remove(USER_ACCESS_KEY.TOKEN);
-    Cookies.remove(USER_ACCESS_KEY.REFRESH_TOKEN);
-    Cookies.remove(USER_ACCESS_KEY.ROLE);
+    clearSessionCookies();
     window.location.href = "/login";
   };
 
@@ -80,9 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (Cookies.get(USER_ACCESS_KEY.TOKEN)) {
       if (getUserDetails.isSuccess && getUserDetails.data) {
         if (getUserDetails.data.role !== Cookies.get(USER_ACCESS_KEY.ROLE)) {
-          Cookies.remove(USER_ACCESS_KEY.TOKEN);
-          Cookies.remove(USER_ACCESS_KEY.REFRESH_TOKEN);
-          Cookies.remove(USER_ACCESS_KEY.ROLE);
+          clearSessionCookies();
           window.location.href = "/login";
         } else {
           setUser(getUserDetails.data);
@@ -93,13 +103,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (getUserDetails.isError) {
-      if (Cookies.get(USER_ACCESS_KEY.TOKEN)) {
-        Cookies.remove(USER_ACCESS_KEY.TOKEN);
-        Cookies.remove(USER_ACCESS_KEY.REFRESH_TOKEN);
-        Cookies.remove(USER_ACCESS_KEY.ROLE);
-        setUser(null);
-      }
-      if (!window.location.pathname.includes("/login") && !window.location.pathname.includes("/forgot-password")) {
+      if (Cookies.get(USER_ACCESS_KEY.TOKEN)) endSession();
+      if (!isAuthPage()) {
         window.location.href = "/login";
       }
     }
@@ -118,7 +123,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ login, logout, user, updatePreferences, updateAvatar, updateProfile }}>
+    <AuthContext.Provider value={{ login, logout, endSession, user, updatePreferences, updateAvatar, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -201,6 +201,11 @@ const AdminFees = () => {
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Sections (optional, narrows classes above)</label>
               <div className="flex flex-wrap gap-2">
+                {sectionOptions.length === 0 && (
+                  <p className="text-sm text-gray-500">
+                    {classIds.length ? "These classes have no sections yet." : "Pick a class above to see its sections."}
+                  </p>
+                )}
                 {sectionOptions.map((s) => (
                   <button
                     key={s.id}

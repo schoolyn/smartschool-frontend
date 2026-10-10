@@ -28,8 +28,10 @@ const useAttendanceController = () => {
   const [reportTo, setReportTo] = useState(today());
 
   const academicYears = useGetAcademicYears(organizationId);
-  const classes = useGetClasses(organizationId, academicYearId, "active");
-  const sections = useGetSections(organizationId, classId, "active");
+  // the report covers past records, so it also lists classes and sections that have since been switched off
+  const listStatus = activeTab === "report" ? undefined : "active";
+  const classes = useGetClasses(organizationId, academicYearId, listStatus);
+  const sections = useGetSections(organizationId, classId, listStatus);
   const roster = useGetSectionRoster(organizationId, sectionId);
   const existing = useGetSectionAttendance(organizationId, sectionId, date);
   const markAttendance = useMarkAttendance(organizationId);
@@ -54,6 +56,17 @@ const useAttendanceController = () => {
     setStatuses(nextStatuses);
     setReasons(nextReasons);
   }, [existing.data]);
+
+  // attendance can only be marked in active classes, so an inactive pick from the report is cleared
+  const changeTab = (tab: Tab) => {
+    if (tab === "mark") {
+      const klass = classes.data?.items.find((item) => item.id === classId);
+      const section = sections.data?.items.find((item) => item.id === sectionId);
+      if (klass?.status === "inactive") onClassChange("");
+      else if (section?.status === "inactive") setSectionId("");
+    }
+    setActiveTab(tab);
+  };
 
   const onAcademicYearChange = (id: string) => {
     setAcademicYearId(id);
@@ -106,7 +119,7 @@ const useAttendanceController = () => {
 
   return {
     activeTab,
-    setActiveTab,
+    setActiveTab: changeTab,
     reportFrom,
     setReportFrom,
     reportTo,
