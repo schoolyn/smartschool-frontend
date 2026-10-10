@@ -5,6 +5,8 @@ import { Switch } from "@/components/ui/switch";
 import useNotificationsController from "./notifications-controller";
 
 const statusColors: Record<string, string> = {
+  // waiting in the email queue, or being retried after a failed attempt
+  queued: "bg-amber-100 text-amber-800",
   sent: "bg-green-100 text-green-800",
   failed: "bg-red-100 text-red-800",
   skipped: "bg-gray-100 text-gray-600",
