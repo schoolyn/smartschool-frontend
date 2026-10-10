@@ -122,7 +122,8 @@
     "login_feature_notices": "Notices",
     "login_feature_fees": "Fees",
     "login_feature_results": "Results",
-    "login_feature_mobile": "Parent app"
+    "login_feature_mobile": "Parent app",
+    "invite_pending": "Invite pending"
   },
   "messages": {
     "enter_email_associate_with_account": "Don't worry! It happens. Please enter your email address associated with your account.",
@@ -164,7 +165,8 @@
     "no_record_found": "No record found. Try changing the filter or add a new user.",
     "no_search_term_found": "No record found matching {{entity}}. Try a different search term or clear the search.",
     "notice_created_successfully": "Notice created successfully.",
-    "organization_created_successfully": "Organization created successfully."
+    "organization_created_successfully": "Organization created successfully.",
+    "invite_resent": "Invite sent again."
   },
   "buttons": {
     "sending": "Sending",
@@ -189,7 +191,8 @@
     "clear_selection": "Clear selection",
     "edit": "Edit",
     "save": "Save",
-    "preview": "Preview"
+    "preview": "Preview",
+    "resend_invite": "Resend invite"
   },
   "common": {
     "notice_types": {

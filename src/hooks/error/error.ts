@@ -27,12 +27,12 @@ const useError = ({
 
       if (errorCode === "EX-00001" || errorCode === "EX-00006") {
         navigate("/login");
-      } else if (errorCode === "EX-00101") {
+      } else if (errorCode === "EX-00101" && mutation.error.response?.Error?.name === "ValidationError") {
+        // the sign-in failure; other errors share that code, so the name tells them apart
         toast.error(t("messages.invalid_credentials"));
-      } else if (mutation.error.response?.Error?.name === "AuthorizationError") {
-        toast.error(mutation.error.response.Error.message || t("messages.something_went_wrong"));
       } else {
-        toast.error(t("messages.something_went_wrong"));
+        // the server only ever sends a message meant for people (server faults get a generic one)
+        toast.error(mutation.error.response?.Error?.message || t("messages.something_went_wrong"));
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions

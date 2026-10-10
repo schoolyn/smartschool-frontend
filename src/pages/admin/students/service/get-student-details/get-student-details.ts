@@ -8,7 +8,7 @@ interface IStudentResponse {
   id: string;
   name: string;
   currentEnrollment: IStudentEnrollment | null;
-  parentId: string | { name?: string; email?: string; phoneNumber?: string } | null;
+  parentId: string | { id?: string; name?: string; email?: string; phoneNumber?: string; status?: string } | null;
   dateOfBirth: string;
   address?: string;
   city?: string;

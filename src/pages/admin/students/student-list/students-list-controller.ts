@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import debounce from "lodash.debounce";
+import toast from "react-hot-toast";
 
-import { useAddStudent, useDeleteStudent, useGetStudentDetails, useUpdateStudentDetail } from "../service";
+import {
+  useAddStudent,
+  useDeleteStudent,
+  useGetStudentDetails,
+  useReinviteParent,
+  useUpdateStudentDetail,
+} from "../service";
 import { IStudentFormData } from "@/types";
 import { EMAIL_REGEX_PATTERN, TOTAL_STEPS } from "@/utils";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,7 +26,6 @@ const useStudentsListController = () => {
   const { t } = useTranslation();
   const { organizationId } = useParams();
   const navigate = useNavigate();
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -32,7 +38,6 @@ const useStudentsListController = () => {
   const [itemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [classFilter, setClassFilter] = useState("all");
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [deleteStudentId, setDeleteStudentId] = useState<string>("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -60,10 +65,6 @@ const useStudentsListController = () => {
   };
 
   // Toggle dropdown menu
-  const toggleDropdown = (studentId: string) => {
-    setActiveDropdown(activeDropdown === studentId ? null : studentId);
-  };
-
   const academicYears = useGetAcademicYears(organizationId || "");
   const currentAcademicYearId =
     academicYears.data?.items.find((y) => y.isCurrent)?.id || academicYears.data?.items[0]?.id || "";
@@ -106,6 +107,9 @@ const useStudentsListController = () => {
   const getParentDetails = useGetParentByEmail(organizationId || "", parentEmail);
 
   const deleteStudent = useDeleteStudent(organizationId || "");
+  const reinviteParent = useReinviteParent();
+
+  useError({ mutation: reinviteParent });
 
   useError({
     mutation: deleteStudent,
@@ -151,6 +155,10 @@ const useStudentsListController = () => {
     setDeleteStudentId("");
   };
 
+  const handleResendInvite = (parentUserId: string) => {
+    reinviteParent.mutate(parentUserId, { onSuccess: () => toast.success(t("messages.invite_resent")) });
+  };
+
   const handleDeleteStudent = () => {
     if (!deleteStudentId) return;
     deleteStudent.mutate(deleteStudentId);
@@ -184,20 +192,6 @@ const useStudentsListController = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addStudentProfile.isSuccess]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setActiveDropdown(null);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     getStudentDetails.refetch();
@@ -234,8 +228,6 @@ const useStudentsListController = () => {
     itemsPerPage,
     searchTerm,
     classFilter,
-    activeDropdown,
-    dropdownRef,
     isDeleteModalOpen,
     deleteStudentId,
     studentDetail: getStudentDetails?.data?.items,
@@ -252,12 +244,11 @@ const useStudentsListController = () => {
     setCurrentStep,
     onClickAddStudent,
     paginate,
-    toggleDropdown,
     setSearchTerm,
-    setActiveDropdown,
     handleClassFilterChange,
     handleDeleteAction,
     handleDeleteStudent,
+    handleResendInvite,
     onCancelDeleteModal,
     setClassFilter,
     navigateToStudentDetails,
