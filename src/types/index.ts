@@ -776,7 +776,7 @@ export interface IEmailLog {
   recipientEmail: string;
   type: string;
   subject: string;
-  status: "sent" | "failed" | "skipped";
+  status: "queued" | "sent" | "failed" | "skipped";
   reason?: string;
   createdAt: string;
 }
