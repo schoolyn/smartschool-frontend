@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-import { useError } from "@/hooks";
+import { useError } from "@/shared/lib/hooks";
 import { defaultOnlinePaymentsValues, onlinePaymentsSchema, OnlinePaymentsFormValues } from "./online-payments.schema";
-import { useGetOnlinePaymentSettings, useSaveOnlinePaymentSettings } from "./service/online-payments-service";
+import { useGetOnlinePaymentSettings, useSaveOnlinePaymentSettings } from "@/entities/online-payment";
 
 // the school connects its own Razorpay account, so parents' fees go straight to the school's bank
 const useOnlinePaymentsController = () => {
@@ -15,7 +15,10 @@ const useOnlinePaymentsController = () => {
   const save = useSaveOnlinePaymentSettings(organizationId);
   useError({ mutation: save });
 
-  const form = useForm<OnlinePaymentsFormValues>({ resolver: zodResolver(onlinePaymentsSchema), defaultValues: defaultOnlinePaymentsValues });
+  const form = useForm<OnlinePaymentsFormValues>({
+    resolver: zodResolver(onlinePaymentsSchema),
+    defaultValues: defaultOnlinePaymentsValues,
+  });
   // filled on load and after new keys are saved; turning the switch leaves typed values alone
   const savedKeyId = settings.data?.keyId;
   const connectedAt = settings.data?.connectedAt;
@@ -38,7 +41,13 @@ const useOnlinePaymentsController = () => {
   });
 
   const toggle = (enabled: boolean) =>
-    save.mutate({ enabled }, { onSuccess: () => toast.success(enabled ? "Parents can now pay fees online." : "Online fee payments turned off.") });
+    save.mutate(
+      { enabled },
+      {
+        onSuccess: () =>
+          toast.success(enabled ? "Parents can now pay fees online." : "Online fee payments turned off."),
+      }
+    );
 
   const copyWebhook = async () => {
     try {

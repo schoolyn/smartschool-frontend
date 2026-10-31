@@ -1,7 +1,4 @@
-import { useLocation } from "react-router-dom";
-
-import { useCurrentRole } from "@/context/tenant-context";
-import SectionHeader from "@/components/section-header";
+import SectionHeader from "@/shared/ui/section-header";
 import {
   UserIcon,
   PencilIcon,
@@ -15,15 +12,15 @@ import {
 } from "@heroicons/react/24/outline";
 
 import useProfileController from "./profile-controller";
-import ButtonSpinner from "@/icons/button-spinner";
-import PageLoader from "@/components/page-loader";
-import CustomSelectDropdown from "@/components/custom-select";
-import { Switch } from "@/components/ui/switch";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { SelectOption } from "@/types";
+import ButtonSpinner from "@/shared/ui/icons/button-spinner";
+import PageLoader from "@/shared/ui/page-loader";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import { Switch } from "@/shared/ui/kit/switch";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/kit/form";
+import { Button } from "@/shared/ui/kit/button";
+import { Input } from "@/shared/ui/kit/input";
+import { Label } from "@/shared/ui/kit/label";
+import { SelectOption } from "@/shared/types";
 
 const AdminProfile = () => {
   const {
@@ -48,10 +45,9 @@ const AdminProfile = () => {
     passwordForm,
     onSubmitPasswordChange,
     isChangingPassword,
+    standalone,
+    currentRole,
   } = useProfileController();
-  const currentRole = useCurrentRole();
-  // inside Settings the page header is already there; teachers and parents open Profile on its own
-  const standalone = !useLocation().pathname.includes("/settings/");
 
   const languageOptions: SelectOption[] = [
     { id: "en", name: t("common.languages.english") },
@@ -71,9 +67,7 @@ const AdminProfile = () => {
           {standalone && <SectionHeader title="Profile" description="Your details, password and preferences" />}
           <div className="">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left column - 2/3 width */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Profile Information Card */}
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                   <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                     <h3 className="text-lg font-medium text-gray-900">{t("labels.profile_information")}</h3>
@@ -176,7 +170,6 @@ const AdminProfile = () => {
                   </div>
                 </div>
 
-                {/* Change Password Card */}
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                   <div className="px-4 py-5 sm:px-6">
                     <h3 className="text-lg font-medium text-gray-900 flex items-center">
@@ -239,9 +232,7 @@ const AdminProfile = () => {
                 </div>
               </div>
 
-              {/* Right column - 1/3 width */}
               <div className="space-y-6">
-                {/* Your Photo Card */}
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                   <div className="px-4 py-5 sm:px-6">
                     <h3 className="text-lg font-medium text-gray-900">{t("labels.your_photo")}</h3>
@@ -280,7 +271,6 @@ const AdminProfile = () => {
                   </div>
                 </div>
 
-                {/* Preferences Card */}
                 <div className="bg-white shadow rounded-lg overflow-hidden">
                   <div className="px-4 py-5 sm:px-6">
                     <h3 className="text-lg font-medium text-gray-900">{t("labels.preferences")}</h3>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useGetLeaveRequestsReviewQueue, useDecideLeaveRequest } from "./service/leave-request-service";
+import { useGetLeaveRequestsReviewQueue, useDecideLeaveRequest } from "@/entities/leave-request";
 
 export const useLeaveRequestsController = () => {
   const { organizationId = "" } = useParams();

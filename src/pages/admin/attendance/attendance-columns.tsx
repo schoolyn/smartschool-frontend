@@ -1,9 +1,9 @@
-import { DataTableColumn } from "@/components/data-table";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { AttendanceStatus } from "@/types";
+import { DataTableColumn } from "@/shared/ui/data-table";
+import { Input } from "@/shared/ui/kit/input";
+import { cn } from "@/shared/lib/utils";
+import { AttendanceStatus } from "@/entities/attendance";
 import { percent } from "./attendance-controller";
-import { ISectionAttendanceReportRow, ISectionRosterStudent } from "./service/attendance-service";
+import { ISectionAttendanceReportRow, ISectionRosterStudent } from "@/entities/attendance";
 
 const STATUSES: AttendanceStatus[] = ["present", "absent", "late", "excused"];
 
@@ -22,7 +22,12 @@ interface RosterColumnProps {
 }
 
 // a register row: roll, name, one tap to change the mark, and a reason only when it isn't present
-export const rosterColumns = ({ statuses, reasons, setStatus, setReason }: RosterColumnProps): DataTableColumn<ISectionRosterStudent>[] => [
+export const rosterColumns = ({
+  statuses,
+  reasons,
+  setStatus,
+  setReason,
+}: RosterColumnProps): DataTableColumn<ISectionRosterStudent>[] => [
   {
     id: "roll",
     header: "Roll",
@@ -41,7 +46,11 @@ export const rosterColumns = ({ statuses, reasons, setStatus, setReason }: Roste
     cell: ({ row: { original: student } }) => {
       const current = statuses[student.id] || "present";
       return (
-        <div role="radiogroup" aria-label={`Attendance for ${student.name}`} className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+        <div
+          role="radiogroup"
+          aria-label={`Attendance for ${student.name}`}
+          className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5"
+        >
           {STATUSES.map((status) => (
             <button
               key={status}
@@ -82,11 +91,45 @@ export const rosterColumns = ({ statuses, reasons, setStatus, setReason }: Roste
 ];
 
 export const reportColumns: DataTableColumn<ISectionAttendanceReportRow>[] = [
-  { id: "rollNumber", header: "Roll No.", meta: { className: "text-gray-500" }, cell: ({ row }) => row.original.rollNumber },
-  { id: "student", header: "Student", cell: ({ row }) => <span className="font-medium text-gray-900">{row.original.studentName}</span> },
-  { id: "present", header: "Present", meta: { align: "center" }, cell: ({ row }) => <span className="text-green-700">{row.original.present}</span> },
-  { id: "absent", header: "Absent", meta: { align: "center" }, cell: ({ row }) => <span className="text-red-700">{row.original.absent}</span> },
-  { id: "late", header: "Late", meta: { align: "center" }, cell: ({ row }) => <span className="text-amber-700">{row.original.late}</span> },
-  { id: "excused", header: "Excused", meta: { align: "center" }, cell: ({ row }) => <span className="text-gray-700">{row.original.excused}</span> },
-  { id: "percent", header: "%", meta: { align: "center" }, cell: ({ row }) => <span className="font-medium text-gray-900">{percent(row.original)}%</span> },
+  {
+    id: "rollNumber",
+    header: "Roll No.",
+    meta: { className: "text-gray-500" },
+    cell: ({ row }) => row.original.rollNumber,
+  },
+  {
+    id: "student",
+    header: "Student",
+    cell: ({ row }) => <span className="font-medium text-gray-900">{row.original.studentName}</span>,
+  },
+  {
+    id: "present",
+    header: "Present",
+    meta: { align: "center" },
+    cell: ({ row }) => <span className="text-green-700">{row.original.present}</span>,
+  },
+  {
+    id: "absent",
+    header: "Absent",
+    meta: { align: "center" },
+    cell: ({ row }) => <span className="text-red-700">{row.original.absent}</span>,
+  },
+  {
+    id: "late",
+    header: "Late",
+    meta: { align: "center" },
+    cell: ({ row }) => <span className="text-amber-700">{row.original.late}</span>,
+  },
+  {
+    id: "excused",
+    header: "Excused",
+    meta: { align: "center" },
+    cell: ({ row }) => <span className="text-gray-700">{row.original.excused}</span>,
+  },
+  {
+    id: "percent",
+    header: "%",
+    meta: { align: "center" },
+    cell: ({ row }) => <span className="font-medium text-gray-900">{percent(row.original)}%</span>,
+  },
 ];

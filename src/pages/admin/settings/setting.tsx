@@ -8,7 +8,7 @@ import OnlinePayments from "./online-payments";
 import MemberAccess from "./member-access";
 import RoleDefaults from "./role-defaults";
 import SchoolSettings from "./school";
-import ModuleGate from "@/components/module-gate";
+import { ModuleGate } from "@/widgets/module-gate";
 
 const Settings = () => {
   return (

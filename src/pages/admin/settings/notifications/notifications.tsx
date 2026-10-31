@@ -1,6 +1,6 @@
-import DataTable, { DataTableColumn } from "@/components/data-table";
-import { Switch } from "@/components/ui/switch";
-import { IEmailLog } from "@/types";
+import DataTable, { DataTableColumn } from "@/shared/ui/data-table";
+import { Switch } from "@/shared/ui/kit/switch";
+import { IEmailLog } from "@/entities/notification";
 import useNotificationsController from "./notifications-controller";
 
 const statusColors: Record<string, string> = {
@@ -12,7 +12,11 @@ const statusColors: Record<string, string> = {
 };
 
 const columns: DataTableColumn<IEmailLog>[] = [
-  { id: "recipient", header: "Recipient", cell: ({ row }) => <span className="font-medium text-gray-900">{row.original.recipientEmail}</span> },
+  {
+    id: "recipient",
+    header: "Recipient",
+    cell: ({ row }) => <span className="font-medium text-gray-900">{row.original.recipientEmail}</span>,
+  },
   {
     id: "subject",
     header: "Subject",
@@ -42,8 +46,16 @@ const columns: DataTableColumn<IEmailLog>[] = [
 ];
 
 const Notifications = () => {
-  const { t, emailNotificationsEnabled, feeRemindersEnabled, emailLog, isLoading, isUpdating, toggleEmailNotifications, toggleFeeReminders } =
-    useNotificationsController();
+  const {
+    t,
+    emailNotificationsEnabled,
+    feeRemindersEnabled,
+    emailLog,
+    isLoading,
+    isUpdating,
+    toggleEmailNotifications,
+    toggleFeeReminders,
+  } = useNotificationsController();
 
   return (
     <div>
@@ -52,12 +64,16 @@ const Notifications = () => {
           <div>
             <p className="text-sm font-medium text-gray-900">{t("labels.email_notifications")}</p>
             <p className="text-sm text-gray-500 mt-1">
-              Turn off to stop every email Opscul sends for this school - fee receipts, notices, homework,
-              attendance, results and leave-request updates. A parent or staff member can still turn their own
-              email notifications off separately regardless of this setting.
+              Turn off to stop every email Opscul sends for this school - fee receipts, notices, homework, attendance,
+              results and leave-request updates. A parent or staff member can still turn their own email notifications
+              off separately regardless of this setting.
             </p>
           </div>
-          <Switch checked={emailNotificationsEnabled} disabled={isUpdating} onCheckedChange={toggleEmailNotifications} />
+          <Switch
+            checked={emailNotificationsEnabled}
+            disabled={isUpdating}
+            onCheckedChange={toggleEmailNotifications}
+          />
         </div>
         <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">
           <div>

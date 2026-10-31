@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import type { UseMutationResult } from "@tanstack/react-query";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { PasswordInput } from "@/components/ui/password-input";
-import ButtonSpinner from "@/icons/button-spinner";
-import { IAPIError } from "@/types";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/kit/form";
+import { PasswordInput } from "@/shared/ui/kit/password-input";
+import ButtonSpinner from "@/shared/ui/icons/button-spinner";
+import { IAPIError } from "@/shared/types";
 import AuthHeading from "./auth-heading";
 import AuthLayout from "./auth-layout";
 import AuthSubmitButton from "./auth-submit-button";

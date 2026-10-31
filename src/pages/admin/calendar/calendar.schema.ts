@@ -7,4 +7,9 @@ export const calendarEntrySchema = z.object({
   repeat: z.enum(["none", "weekly"]),
 });
 export type CalendarEntryFormValues = z.infer<typeof calendarEntrySchema>;
-export const defaultCalendarEntryValues: CalendarEntryFormValues = { title: "", type: "event", date: "", repeat: "none" };
+export const defaultCalendarEntryValues: CalendarEntryFormValues = {
+  title: "",
+  type: "event",
+  date: "",
+  repeat: "none",
+};

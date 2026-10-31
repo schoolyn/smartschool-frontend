@@ -1,3 +1,5 @@
+import { useLocation } from "react-router-dom";
+import { useCurrentRole } from "@/entities/session";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -5,11 +7,11 @@ import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 
-import { useAuth } from "@/context/auth-context";
-import { useTheme } from "@/context/theme-context";
-import { useUpdateUserPreferences, useUploadAvatar, useUpdateMyProfile, useChangeMyPassword } from "./service";
-import { useError } from "@/hooks";
-import { IAPIError } from "@/types";
+import { useAuth } from "@/entities/session";
+import { useTheme } from "@/features/theme";
+import { useUpdateUserPreferences, useUploadAvatar, useUpdateMyProfile, useChangeMyPassword } from "@/entities/session";
+import { useError } from "@/shared/lib/hooks";
+import { IAPIError } from "@/shared/types";
 import { editProfileSchema, changePasswordSchema, defaultChangePasswordValues } from "./profile.schema";
 
 const useProfileController = () => {
@@ -33,8 +35,7 @@ const useProfileController = () => {
     defaultValues: defaultChangePasswordValues,
   });
 
-  // the user object only exists once /get-user-details resolves, so seed the form
-  // the moment it's ready rather than leaving the fields blank
+  // the user only exists once /get-user-details resolves, so seed the form the moment it's ready
   useEffect(() => {
     if (user) {
       profileForm.reset({ name: user.name || "", phoneNumber: user.phoneNumber || "" });
@@ -72,12 +73,10 @@ const useProfileController = () => {
     );
   });
 
-  // react-i18next already re-renders on language change, so i18n.language itself
-  // is the current language - no need to mirror it into its own state
+  // react-i18next re-renders on language change, so i18n.language needs no mirrored state
   const currentLanguage = i18n.language || "en";
 
-  // derived straight from the shared user object, same as theme/notifications -
-  // no local state, so a refresh (or another tab) always shows what's actually saved
+  // derived from the shared user object, so a refresh or another tab always shows what's saved
   const imageUrl = user?.avatar?.url;
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,8 +104,7 @@ const useProfileController = () => {
     setTheme(newTheme);
   };
 
-  // derived straight from the shared user object - no local state to keep in sync,
-  // defaulting true (matches the backend default) until the user is known
+  // derived from the shared user object; defaults true (the backend default) until the user is known
   const emailNotifications = user?.preferences?.emailNotifications ?? true;
   const smsNotifications = user?.preferences?.smsNotifications ?? true;
 
@@ -120,8 +118,14 @@ const useProfileController = () => {
     updateServerPreferences.mutate({ smsNotifications: checked });
   };
 
+  const location = useLocation();
+  // inside Settings the page header is already there; teachers and parents open Profile on its own
+  const standalone = !location.pathname.includes("/settings/");
+
   return {
     t,
+    standalone,
+    currentRole: useCurrentRole(),
     user,
     editMode,
     imageUrl,

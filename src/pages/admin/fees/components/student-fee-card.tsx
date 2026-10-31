@@ -1,11 +1,12 @@
-import DataTable from "@/components/data-table";
-import { SelectField, TextField } from "@/components/form-fields";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import { IStudentFeeSummary, SelectOption } from "@/types";
-import { formatMoney } from "@/utils";
+import DataTable from "@/shared/ui/data-table";
+import { SelectField, TextField } from "@/shared/ui/form-fields";
+import { Badge } from "@/shared/ui/kit/badge";
+import { Button } from "@/shared/ui/kit/button";
+import { Card } from "@/shared/ui/kit/card";
+import { Form } from "@/shared/ui/kit/form";
+import { IStudentFeeSummary } from "@/entities/fee";
+import { SelectOption } from "@/shared/types";
+import { formatMoney } from "@/shared/lib";
 import { concessionColumns, installmentColumns, paymentColumns } from "./student-fee-card-columns";
 import useStudentFeeCardController from "./student-fee-card-controller";
 
@@ -31,9 +32,12 @@ const StudentFeeCard = ({ organizationId, summary, onReverse }: StudentFeeCardPr
   return (
     <Card>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-base font-medium text-gray-900">
-          Balance: {formatMoney(summary.totalBalance)} of {formatMoney(summary.totalNet)}
-        </h3>
+        <div>
+          {summary.feeStructureName && <p className="text-sm text-gray-500">{summary.feeStructureName}</p>}
+          <h3 className="text-base font-medium text-gray-900">
+            Balance: {formatMoney(summary.totalBalance)} of {formatMoney(summary.totalNet)}
+          </h3>
+        </div>
         <Badge tone={summary.totalBalance > 0 ? "red" : "green"}>
           {summary.totalBalance > 0 ? "Due" : "Fully paid"}
         </Badge>

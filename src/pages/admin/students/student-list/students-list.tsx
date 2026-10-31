@@ -1,15 +1,14 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import CustomSelectDropdown from "@/components/custom-select";
-import DataTable from "@/components/data-table";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import ExportDialog from "@/components/export-dialog";
-import SectionHeader from "@/components/section-header";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { SelectOption } from "@/types";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import DataTable from "@/shared/ui/data-table";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import { ExportDialog } from "@/features/export-dialog";
+import SectionHeader from "@/shared/ui/section-header";
+import { Button } from "@/shared/ui/kit/button";
+import { Label } from "@/shared/ui/kit/label";
+import { SelectOption } from "@/shared/types";
 import BulkUploadModal from "../student-modal/bulk-upload-modal";
-import CreateUpdateStudentModal from "../student-modal/create-update-student-modal";
 import { studentColumns } from "./students-list-columns";
 import useStudentsListController from "./students-list-controller";
 
@@ -17,15 +16,11 @@ const StudentsList = () => {
   const {
     t,
     organizationId,
-    form,
     studentDetail,
-    isAddModalOpen,
     isBulkModalOpen,
     onClickBulkUpload,
     onCloseBulkModal,
     onBulkImported,
-    currentStep,
-    isParentExist,
     studentTotalCount,
     handleSearchChange,
     searchInput,
@@ -39,16 +34,9 @@ const StudentsList = () => {
     classFilter,
     isDeleteModalOpen,
     deleteStudentId,
-    isLoadingAddStudent,
     isLoadingGetStudentDetails,
-    isLoadingUpdateStudent,
     isDeletingStudent,
     isFetchingStudentList,
-    onSubmit,
-    onCloseModal,
-    nextStep,
-    prevStep,
-    setCurrentStep,
     onClickAddStudent,
     handleClassFilterChange,
     handleDeleteAction,
@@ -77,10 +65,10 @@ const StudentsList = () => {
       <SectionHeader
         title="Students"
         description="View, search and manage every enrolled student"
-        action={{ label: t("labels.add_new_student"), icon: PlusIcon, onClick: onClickAddStudent, hidden: !canManage }}
+        action={{ label: "New Admission", icon: PlusIcon, onClick: onClickAddStudent, hidden: !canManage }}
       />
 
-      <div className="py-4">
+      <div>
         <DataTable
           columns={columns}
           data={studentDetail ?? []}
@@ -136,29 +124,11 @@ const StudentsList = () => {
               : {
                   title: "No students yet",
                   description:
-                    "Add your first student with Add New Student, or bring a whole class in with Bulk Upload (CSV).",
+                    "Admit your first student with New Admission, or bring a whole class in with Bulk Upload (CSV).",
                 }
           }
         />
       </div>
-
-      {/* Add Student Modal */}
-      <CreateUpdateStudentModal
-        t={t}
-        isOpen={isAddModalOpen}
-        organizationId={organizationId}
-        form={form}
-        isEditStudent={false}
-        currentStep={currentStep}
-        isParentExist={isParentExist}
-        isLoadingAddStudent={isLoadingAddStudent}
-        isLoadingUpdateStudent={isLoadingUpdateStudent}
-        nextStep={nextStep}
-        prevStep={prevStep}
-        onClose={onCloseModal}
-        onSubmit={onSubmit}
-        setCurrentStep={setCurrentStep}
-      />
 
       <BulkUploadModal
         isOpen={isBulkModalOpen}

@@ -1,11 +1,16 @@
-import { DataTableColumn } from "@/components/data-table";
-import { Badge } from "@/components/ui/badge";
-import { IAttendanceRecord, IResult } from "@/types";
+import { DataTableColumn } from "@/shared/ui/data-table";
+import { Badge } from "@/shared/ui/kit/badge";
+import { IAttendanceRecord } from "@/entities/attendance";
+import { IResult } from "@/entities/exam";
 
 const examOf = (result: IResult) => (typeof result.examId === "object" ? result.examId : null);
 
 export const examResultColumns: DataTableColumn<IResult>[] = [
-  { id: "exam", header: "Exam", cell: ({ row }) => <span className="font-medium text-gray-900">{examOf(row.original)?.name || "-"}</span> },
+  {
+    id: "exam",
+    header: "Exam",
+    cell: ({ row }) => <span className="font-medium text-gray-900">{examOf(row.original)?.name || "-"}</span>,
+  },
   {
     id: "date",
     header: "Date",
@@ -33,7 +38,12 @@ export const examResultColumns: DataTableColumn<IResult>[] = [
     meta: { className: "text-gray-500" },
     cell: ({ row }) => `${row.original.totals.obtained} / ${row.original.totals.max}`,
   },
-  { id: "percentage", header: "Percentage", meta: { className: "text-gray-500" }, cell: ({ row }) => `${row.original.totals.percentage}%` },
+  {
+    id: "percentage",
+    header: "Percentage",
+    meta: { className: "text-gray-500" },
+    cell: ({ row }) => `${row.original.totals.percentage}%`,
+  },
   { id: "grade", header: "Grade", meta: { className: "text-gray-500" }, cell: ({ row }) => row.original.grade || "-" },
 ];
 
@@ -41,8 +51,17 @@ export const attendanceRecordColumns: DataTableColumn<IAttendanceRecord>[] = [
   {
     id: "date",
     header: "Date",
-    cell: ({ row }) => <span className="text-gray-900">{row.original.date ? new Date(row.original.date).toLocaleDateString() : "-"}</span>,
+    cell: ({ row }) => (
+      <span className="text-gray-900">
+        {row.original.date ? new Date(row.original.date).toLocaleDateString() : "-"}
+      </span>
+    ),
   },
   { id: "status", header: "Status", cell: ({ row }) => <span className="capitalize">{row.original.status}</span> },
-  { id: "reason", header: "Reason", meta: { className: "text-gray-500" }, cell: ({ row }) => row.original.reason || "-" },
+  {
+    id: "reason",
+    header: "Reason",
+    meta: { className: "text-gray-500" },
+    cell: ({ row }) => row.original.reason || "-",
+  },
 ];

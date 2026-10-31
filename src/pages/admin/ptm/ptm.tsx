@@ -1,12 +1,12 @@
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import type { Action } from "@/components/action-buttons";
-import ErrorState from "@/components/error-state";
-import EmptyState from "@/components/empty-state";
-import SectionHeader from "@/components/section-header";
-import Spinner from "@/components/spinner";
-import { cn } from "@/lib/utils";
+import type { Action } from "@/shared/ui/action-buttons";
+import ErrorState from "@/shared/ui/error-state";
+import EmptyState from "@/shared/ui/empty-state";
+import SectionHeader from "@/shared/ui/section-header";
+import Spinner from "@/shared/ui/spinner";
+import { cn } from "@/shared/lib/utils";
 import CreateEventDialog from "./components/create-event-dialog";
 import EventSlotsPanel from "./components/event-slots-panel";
 import useAdminPTMController from "./ptm-controller";
@@ -30,7 +30,10 @@ const AdminPTM = () => {
           {c.isLoading ? (
             <Spinner />
           ) : c.items.length === 0 ? (
-            <EmptyState title="No PTM events yet" description="Use Schedule PTM to create the first parent-teacher meeting." />
+            <EmptyState
+              title="No PTM events yet"
+              description="Use Schedule PTM to create the first parent-teacher meeting."
+            />
           ) : (
             <div className="divide-y divide-gray-200">
               {c.items.map((event) => {
@@ -46,7 +49,8 @@ const AdminPTM = () => {
                       <div>
                         <p className="font-medium text-gray-900">{event.title}</p>
                         <p className="text-sm capitalize text-gray-500">
-                          {new Date(event.date).toLocaleDateString()} · {event.mode} · {event.slotDurationMins} min slots
+                          {new Date(event.date).toLocaleDateString()} · {event.mode} · {event.slotDurationMins} min
+                          slots
                         </p>
                       </div>
                       <span className="flex items-center gap-1 text-sm text-primary-600">
@@ -54,7 +58,9 @@ const AdminPTM = () => {
                         <ChevronDownIcon className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
                       </span>
                     </button>
-                    {isOpen && <EventSlotsPanel organizationId={c.organizationId} event={event} assignments={c.assignments} />}
+                    {isOpen && (
+                      <EventSlotsPanel organizationId={c.organizationId} event={event} assignments={c.assignments} />
+                    )}
                   </div>
                 );
               })}

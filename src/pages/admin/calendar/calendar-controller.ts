@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useCan } from "@/context/tenant-context";
-import { useError } from "@/hooks";
-import { ICalendarEntry } from "@/types";
-import { localDateString } from "@/utils";
+import { useCan } from "@/entities/session";
+import { useError } from "@/shared/lib/hooks";
+import { ICalendarEntry } from "@/entities/calendar";
+import { localDateString } from "@/shared/lib";
 import { EntryFilter } from "./components/events-sidebar";
 import { toGridItems } from "./calendar.utils";
-import { useDeleteCalendarEntry, useGetCalendarMonth } from "./service/calendar-service";
+import { useDeleteCalendarEntry, useGetCalendarMonth } from "@/entities/calendar";
 
 const useCalendarController = () => {
   const { organizationId = "" } = useParams();
@@ -35,7 +35,10 @@ const useCalendarController = () => {
       return { year: next.getFullYear(), month: next.getMonth() + 1 };
     });
 
-  const label = new Date(cursor.year, cursor.month - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  const label = new Date(cursor.year, cursor.month - 1, 1).toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric",
+  });
   const editEntry = (entry: ICalendarEntry) => setDialog({ entry, date: entry.date });
 
   const confirmDelete = () =>

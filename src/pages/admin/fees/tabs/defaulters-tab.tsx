@@ -1,12 +1,12 @@
-import AcademicFilter from "@/components/academic-filter";
-import DataTable, { DataTableColumn } from "@/components/data-table";
-import DatePicker from "@/components/date-picker";
-import ErrorState from "@/components/error-state";
-import ExportDialog from "@/components/export-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardTitle } from "@/components/ui/card";
-import { IFeeDefaulter } from "@/types";
-import { formatMoney } from "@/utils";
+import { AcademicFilter } from "@/features/academic-filter";
+import DataTable, { DataTableColumn } from "@/shared/ui/data-table";
+import DatePicker from "@/shared/ui/date-picker";
+import ErrorState from "@/shared/ui/error-state";
+import { ExportDialog } from "@/features/export-dialog";
+import { Badge } from "@/shared/ui/kit/badge";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
+import { IFeeDefaulter } from "@/entities/fee";
+import { formatMoney } from "@/shared/lib";
 import useDefaultersController from "./defaulters-controller";
 
 const formatDay = (iso: string) =>
@@ -98,7 +98,7 @@ const DefaultersTab = ({ organizationId }: { organizationId: string }) => {
         <CardTitle className="mb-4 font-medium">Fee Defaulters</CardTitle>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <AcademicFilter organizationId={organizationId} value={c.scope} onChange={c.onScopeChange} />
-          <DatePicker label="Overdue as of" value={c.asOf} onChange={c.onAsOfChange} />
+          <DatePicker clearable={false} label="Overdue as of" value={c.asOf} onChange={c.onAsOfChange} />
         </div>
       </Card>
 
@@ -116,7 +116,7 @@ const DefaultersTab = ({ organizationId }: { organizationId: string }) => {
         <DataTable
           columns={columns}
           data={c.rows}
-          getRowId={(row) => row.studentFeeId}
+          getRowId={(row) => row.studentId}
           isLoading={c.isLoading}
           pagination={c.pagination}
           itemLabel={{ one: "defaulter", other: "defaulters" }}

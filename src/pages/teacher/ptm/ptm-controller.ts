@@ -3,11 +3,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useGetPTMEvents, useGenerateSlots, useGetMyPTMAgenda } from "@/pages/admin/ptm/service/ptm-service";
-import { useGetMyTeacherAssignments } from "@/pages/admin/classes/service/academics-service";
-import { useAuth } from "@/context/auth-context";
-import { useError } from "@/hooks";
-import { SelectOption } from "@/types";
+import { useGetPTMEvents, useGenerateSlots, useGetMyPTMAgenda } from "@/entities/ptm";
+import { useGetMyTeacherAssignments } from "@/entities/academics";
+import { useAuth } from "@/entities/session";
+import { useError } from "@/shared/lib/hooks";
+import { SelectOption } from "@/shared/types";
 import { defaultOpenAvailabilityValues, openAvailabilitySchema, OpenAvailabilityFormValues } from "./ptm.schema";
 
 const useTeacherPTMController = () => {
@@ -51,7 +51,13 @@ const useTeacherPTMController = () => {
   const handleGenerateSlots = form.handleSubmit((values) => {
     if (!user?.id) return;
     generateSlots.mutate(
-      { ptmEventId: values.eventId, teacherUserId: user.id, sectionId: values.sectionId, startAt: values.startAt, endAt: values.endAt },
+      {
+        ptmEventId: values.eventId,
+        teacherUserId: user.id,
+        sectionId: values.sectionId,
+        startAt: values.startAt,
+        endAt: values.endAt,
+      },
       {
         onSuccess: () => {
           toast.success("Slots generated.");

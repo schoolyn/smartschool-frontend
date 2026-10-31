@@ -2,12 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/kit/form";
+import { Input } from "@/shared/ui/kit/input";
 import AuthHeading from "../components/auth-heading";
 import AuthLayout from "../components/auth-layout";
 import AuthSubmitButton from "../components/auth-submit-button";
-import { GOOGLE_CAPTCHA_KEY } from "@/utils";
+import { GOOGLE_CAPTCHA_KEY } from "@/shared/lib";
 import useForgotPasswordController from "./forgot-password-controller";
 import ForgotPasswordEmail from "./success/forgot-password-email";
 

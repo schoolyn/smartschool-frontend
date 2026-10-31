@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
-// counts from 0 up to target with an ease-out curve; jumps straight to the target when the user
-// prefers reduced motion
+// counts up to target with an ease-out curve; jumps straight there when the user prefers reduced motion
 export const useCountUp = (target: number | null, duration = 700) => {
   const [value, setValue] = useState(0);
 

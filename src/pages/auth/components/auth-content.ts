@@ -28,7 +28,7 @@ export interface Moment {
   pushBody: string;
 }
 
-// sample school-day scenarios shown beside the sign-in card; copy is kept to one line so the card never changes height
+// sample school-day scenarios beside the sign-in card; one-line copy so the card never changes height
 export const MOMENTS: Moment[] = [
   {
     time: "07:52",

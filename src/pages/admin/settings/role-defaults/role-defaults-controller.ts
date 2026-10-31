@@ -4,9 +4,10 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useError } from "@/hooks";
-import { PermissionKey } from "@/types";
-import { AccessCatalog, RoleDefaultsValues, StaffRole, roleDefaultsSchema, useAccessCatalog, useSetRoleDefaults } from "../access";
+import { useError } from "@/shared/lib/hooks";
+import { PermissionKey } from "@/shared/types";
+import { type AccessCatalog, type StaffRole, useAccessCatalog, useSetRoleDefaults } from "@/entities/access";
+import { RoleDefaultsValues, roleDefaultsSchema } from "../access";
 
 export const ROLE_TITLES: Record<StaffRole, { title: string; hint: string }> = {
   teacher: { title: "Teachers", hint: "Daily classroom work is on by default." },
@@ -17,11 +18,21 @@ export const ROLE_TITLES: Record<StaffRole, { title: string; hint: string }> = {
 const useRoleDefaultsController = () => {
   const { organizationId = "" } = useParams();
   const catalog = useAccessCatalog(organizationId);
-  return { organizationId, catalog: catalog.data, isLoading: catalog.isLoading, error: catalog.error, retry: () => catalog.refetch() };
+  return {
+    organizationId,
+    catalog: catalog.data,
+    isLoading: catalog.isLoading,
+    error: catalog.error,
+    retry: () => catalog.refetch(),
+  };
 };
 
 // one role's school-wide defaults
-export const useRoleCardController = (organizationId: string, catalog: AccessCatalog, entry: AccessCatalog["roles"][number]) => {
+export const useRoleCardController = (
+  organizationId: string,
+  catalog: AccessCatalog,
+  entry: AccessCatalog["roles"][number]
+) => {
   const save = useSetRoleDefaults(organizationId);
   useError({ mutation: save });
 
@@ -30,7 +41,10 @@ export const useRoleCardController = (organizationId: string, catalog: AccessCat
     const wanted = new Set(keys);
     return order.filter((key) => wanted.has(key));
   };
-  const form = useForm<RoleDefaultsValues>({ resolver: zodResolver(roleDefaultsSchema), defaultValues: { permissions: ordered(entry.defaults) } });
+  const form = useForm<RoleDefaultsValues>({
+    resolver: zodResolver(roleDefaultsSchema),
+    defaultValues: { permissions: ordered(entry.defaults) },
+  });
   const permissions = form.watch("permissions");
   useEffect(() => form.reset({ permissions: ordered(entry.defaults) }), [entry.defaults]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -46,7 +60,10 @@ export const useRoleCardController = (organizationId: string, catalog: AccessCat
     isDirty: form.formState.isDirty,
     isSaving: save.isPending,
     save: form.handleSubmit((values) =>
-      save.mutate({ role: entry.role, permissions: values.permissions }, { onSuccess: () => toast.success(`${ROLE_TITLES[entry.role].title} updated.`) })
+      save.mutate(
+        { role: entry.role, permissions: values.permissions },
+        { onSuccess: () => toast.success(`${ROLE_TITLES[entry.role].title} updated.`) }
+      )
     ),
   };
 };

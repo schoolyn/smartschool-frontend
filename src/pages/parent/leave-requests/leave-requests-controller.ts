@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useError } from "@/hooks";
-import { useGetMyChildren } from "../ptm/service/my-children-service";
-import { useGetMyLeaveRequests, useCreateLeaveRequest, useCancelLeaveRequest } from "./service/leave-request-service";
+import { useError } from "@/shared/lib/hooks";
+import { useGetMyChildren } from "@/entities/student";
+import { useGetMyLeaveRequests, useCreateLeaveRequest, useCancelLeaveRequest } from "@/entities/leave-request";
 import { leaveRequestFormSchema, defaultLeaveRequestFormValues } from "./leave-requests.schema";
 
 export const useLeaveRequestsController = () => {
@@ -24,10 +24,6 @@ export const useLeaveRequestsController = () => {
   const createLeaveRequest = useCreateLeaveRequest(organizationId);
   const cancelLeaveRequest = useCancelLeaveRequest(organizationId);
   useError({ mutation: cancelLeaveRequest });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    form.setValue("attachment", e.target.files?.[0] || null);
-  };
 
   const onSubmit = form.handleSubmit((values) => {
     const formData = new FormData();
@@ -69,7 +65,6 @@ export const useLeaveRequestsController = () => {
     setShowForm,
     toggleForm: () => setShowForm((open) => !open),
     form,
-    handleFileChange,
     onSubmit,
     isCreating: createLeaveRequest.isPending,
     handleCancel,

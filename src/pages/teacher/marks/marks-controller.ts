@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetExams, useGetExamSubjects } from "@/pages/admin/reports/service/exams-service";
-import { useGetMyTeacherAssignments } from "@/pages/admin/classes/service/academics-service";
-import { SelectOption } from "@/types";
+import { useGetExams, useGetExamSubjects } from "@/entities/exam";
+import { useGetMyTeacherAssignments } from "@/entities/academics";
+import { SelectOption } from "@/shared/types";
 
-// what the teacher may enter marks for, mirroring the backend rule in exams.service.js's
-// assertCanEnterMarks: the class teacher of a section may enter any subject there; a subject
-// teacher only their own subject
+// mirrors backend assertCanEnterMarks: a class teacher may enter any subject, a subject teacher only theirs
 const useTeacherMarksController = () => {
   const { organizationId = "" } = useParams();
 
@@ -36,7 +34,9 @@ const useTeacherMarksController = () => {
   // the sections of this class the teacher has any assignment in
   const sectionOptions: SelectOption[] = [
     ...new Map(
-      myAssignments.filter((a) => a.classId.id === classId).map((a) => [a.sectionId.id, { id: a.sectionId.id, name: a.sectionId.name }])
+      myAssignments
+        .filter((a) => a.classId.id === classId)
+        .map((a) => [a.sectionId.id, { id: a.sectionId.id, name: a.sectionId.name }])
     ).values(),
   ];
 
@@ -44,10 +44,14 @@ const useTeacherMarksController = () => {
     (a) => a.classId.id === classId && a.sectionId.id === sectionId && a.assignmentRole === "CLASS_TEACHER"
   );
   const subjectIdsTaughtHere = new Set(
-    myAssignments.filter((a) => a.classId.id === classId && a.sectionId.id === sectionId && a.subjectId).map((a) => a.subjectId!.id)
+    myAssignments
+      .filter((a) => a.classId.id === classId && a.sectionId.id === sectionId && a.subjectId)
+      .map((a) => a.subjectId!.id)
   );
   const subjectOptions: SelectOption[] = (examSubjects.data?.items ?? [])
-    .filter((es) => isClassTeacherHere || (typeof es.subjectId === "object" && subjectIdsTaughtHere.has(es.subjectId.id)))
+    .filter(
+      (es) => isClassTeacherHere || (typeof es.subjectId === "object" && subjectIdsTaughtHere.has(es.subjectId.id))
+    )
     .map((es) => ({ id: es.id, name: typeof es.subjectId === "object" ? es.subjectId.name : "" }));
 
   const onExamChange = (id: string) => {

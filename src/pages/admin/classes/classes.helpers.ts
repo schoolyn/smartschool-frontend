@@ -6,7 +6,7 @@ const addYearToDate = (isoDate: string) => {
   return date.toISOString().slice(0, 10);
 };
 
-// "2026-27" becomes "2027-28", "2026-2027" becomes "2027-2028", "2026" becomes "2027"; a name with no year in it is left for the person to type
+// "2026-27" becomes "2027-28", "2026" becomes "2027"; a name with no year is left blank for the person to type
 const nextYearName = (name: string) =>
   YEAR_PATTERN.test(name)
     ? name.replace(YEAR_PATTERN, (match) => {

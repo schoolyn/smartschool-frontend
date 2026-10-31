@@ -1,6 +1,7 @@
-import FormDialog from "@/components/form-dialog";
-import { CheckboxField, SelectField, TextField } from "@/components/form-fields";
-import { IAddGuardianValue, SelectOption } from "@/types";
+import FormDialog from "@/shared/ui/form-dialog";
+import { CheckboxField, SelectField, TextField } from "@/shared/ui/form-fields";
+import { IAddGuardianValue } from "@/entities/student";
+import { SelectOption } from "@/shared/types";
 import useGuardianModalController from "./guardian-modal-controller";
 
 const relationshipOptions: SelectOption[] = [

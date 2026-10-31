@@ -2,9 +2,9 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 
-import { downloadFeeReceipt, useEmailFeeReceipt, useGetMyFees } from "@/pages/admin/fees/service/fees-service";
-import { IAPIError } from "@/types";
-import { usePayFeesOnline } from "./service/online-payment-service";
+import { downloadFeeReceipt, useEmailFeeReceipt, useGetMyFees } from "@/entities/fee";
+import { IAPIError } from "@/shared/types";
+import { usePayFeesOnline } from "@/entities/online-payment";
 
 const useParentFeesController = () => {
   const { t } = useTranslation();
@@ -24,21 +24,29 @@ const useParentFeesController = () => {
         onSuccess: (outcome) => {
           if (outcome === "paid") toast.success("Payment received. Your receipt is ready below.");
           else if (outcome === "needs_review") toast("Payment received. The school will apply it shortly.");
-          else if (outcome === "pending") toast("Payment received. We're confirming it, and your receipt will appear here shortly.");
+          else if (outcome === "pending")
+            toast("Payment received. We're confirming it, and your receipt will appear here shortly.");
         },
         onError: (error) =>
-          toast.error((error as IAPIError)?.response?.Error?.message || (error as Error)?.message || "The payment didn't go through."),
+          toast.error(
+            (error as IAPIError)?.response?.Error?.message ||
+              (error as Error)?.message ||
+              "The payment didn't go through."
+          ),
       }
     );
 
   const isPaying = (studentFeeId: string, label?: string) =>
-    paying?.studentFeeId === studentFeeId && (label ? paying.installmentLabels?.[0] === label : !paying.installmentLabels);
+    paying?.studentFeeId === studentFeeId &&
+    (label ? paying.installmentLabels?.[0] === label : !paying.installmentLabels);
 
   const downloadReceipt = async (paymentId: string) => {
     try {
       await downloadFeeReceipt(organizationId || "", paymentId);
     } catch (error) {
-      toast.error((error as IAPIError)?.response?.Error?.message || "Could not download the receipt. Please try again.");
+      toast.error(
+        (error as IAPIError)?.response?.Error?.message || "Could not download the receipt. Please try again."
+      );
     }
   };
 
@@ -46,7 +54,8 @@ const useParentFeesController = () => {
     emailFeeReceipt.mutate(paymentId, {
       onSuccess: () => toast.success("Receipt emailed to your registered email address."),
       // for example "No registered email address found" says what to fix
-      onError: (error) => toast.error(error?.response?.Error?.message || "Could not email the receipt. Please try again."),
+      onError: (error) =>
+        toast.error(error?.response?.Error?.message || "Could not email the receipt. Please try again."),
     });
 
   return {

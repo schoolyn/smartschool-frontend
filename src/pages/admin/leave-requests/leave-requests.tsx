@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next";
 
-import Spinner from "@/components/spinner";
-import EmptyState from "@/components/empty-state";
-import SectionHeader from "@/components/section-header";
-import CustomSelectDropdown from "@/components/custom-select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import Spinner from "@/shared/ui/spinner";
+import EmptyState from "@/shared/ui/empty-state";
+import SectionHeader from "@/shared/ui/section-header";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import { Button } from "@/shared/ui/kit/button";
+import { Input } from "@/shared/ui/kit/input";
 import { useLeaveRequestsController } from "./leave-requests-controller";
-import { SelectOption } from "@/types";
+import { SelectOption } from "@/shared/types";
 
 const STATUS_OPTIONS: SelectOption[] = [
   { id: "pending", name: "Pending" },
@@ -22,10 +22,7 @@ const LeaveRequests = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <SectionHeader
-        title="Leave Requests"
-        description="Review and decide on student leave requests"
-      />
+      <SectionHeader title="Leave Requests" description="Review and decide on student leave requests" />
 
       <div className="bg-white shadow rounded-lg">
         <div className="flex justify-end border-b border-gray-200 px-4 py-3">

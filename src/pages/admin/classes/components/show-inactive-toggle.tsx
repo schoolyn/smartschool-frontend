@@ -1,4 +1,4 @@
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/shared/ui/kit/switch";
 
 const ShowInactiveToggle = ({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) => (
   <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600">

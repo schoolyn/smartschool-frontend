@@ -1,7 +1,7 @@
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { PermissionKey } from "@/types";
-import { AccessCatalog } from "../service/access-service";
+import { Badge } from "@/shared/ui/kit/badge";
+import { Switch } from "@/shared/ui/kit/switch";
+import { PermissionKey } from "@/shared/types";
+import { AccessCatalog } from "@/entities/access";
 
 interface PermissionListProps {
   permissions: AccessCatalog["permissions"];
@@ -30,7 +30,12 @@ const PermissionList = ({ permissions, value, defaults, disabled, onToggle }: Pe
                       <span className="text-sm text-gray-900">{p.label}</span>
                       {changed && <Badge tone={on ? "blue" : "yellow"}>{on ? "Added" : "Removed"}</Badge>}
                     </div>
-                    <Switch checked={on} disabled={disabled} onCheckedChange={(next) => onToggle(p.key, next)} aria-label={p.label} />
+                    <Switch
+                      checked={on}
+                      disabled={disabled}
+                      onCheckedChange={(next) => onToggle(p.key, next)}
+                      aria-label={p.label}
+                    />
                   </div>
                 );
               })}

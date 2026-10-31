@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 import { MOMENTS } from "./auth-content";
 import { useAutoAdvance } from "./use-auto-advance";
 
@@ -18,7 +18,7 @@ const MomentList = ({ active, onSelect }: { active: number; onSelect: (index: nu
           onClick={() => onSelect(i)}
           className={cn(
             "grid w-full grid-cols-[52px_1fr_auto] items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-white/5",
-            on && "bg-white/5",
+            on && "bg-white/5"
           )}
         >
           <span className={cn("font-mono text-[12px]", on ? "text-white" : "text-white/40")}>{moment.time}</span>

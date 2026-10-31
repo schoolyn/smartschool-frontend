@@ -3,10 +3,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-import { useError } from "@/hooks";
-import { IFeeHead } from "@/types";
-import { defaultFeeHeadValues, feeHeadEditSchema, FeeHeadEditValues, feeHeadSchema, FeeHeadFormValues } from "../fees.schema";
-import { useCreateFeeHead, useDeactivateFeeHead, useGetFeeHeads, useUpdateFeeHead } from "../service/fees-service";
+import { useError } from "@/shared/lib/hooks";
+import { IFeeHead } from "@/entities/fee";
+import {
+  defaultFeeHeadValues,
+  feeHeadEditSchema,
+  FeeHeadEditValues,
+  feeHeadSchema,
+  FeeHeadFormValues,
+} from "../fees.schema";
+import { useCreateFeeHead, useDeactivateFeeHead, useGetFeeHeads, useUpdateFeeHead } from "@/entities/fee";
 
 const useFeeHeadsController = (organizationId: string) => {
   const feeHeads = useGetFeeHeads(organizationId);
@@ -17,8 +23,14 @@ const useFeeHeadsController = (organizationId: string) => {
   useError({ mutation: updateFeeHead });
   useError({ mutation: deactivateFeeHead });
 
-  const form = useForm<FeeHeadFormValues>({ resolver: zodResolver(feeHeadSchema), defaultValues: defaultFeeHeadValues });
-  const editForm = useForm<FeeHeadEditValues>({ resolver: zodResolver(feeHeadEditSchema), defaultValues: { name: "", category: "tuition", isRefundable: false } });
+  const form = useForm<FeeHeadFormValues>({
+    resolver: zodResolver(feeHeadSchema),
+    defaultValues: defaultFeeHeadValues,
+  });
+  const editForm = useForm<FeeHeadEditValues>({
+    resolver: zodResolver(feeHeadEditSchema),
+    defaultValues: { name: "", category: "tuition", isRefundable: false },
+  });
   const [editing, setEditing] = useState<IFeeHead | null>(null);
   const [retiring, setRetiring] = useState<IFeeHead | null>(null);
 

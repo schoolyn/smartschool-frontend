@@ -2,10 +2,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-import { useCan } from "@/context/tenant-context";
-import { useError } from "@/hooks";
-import { IStudentFeeSummary, SelectOption } from "@/types";
-import { toPaise } from "@/utils";
+import { useCan } from "@/entities/session";
+import { useError } from "@/shared/lib/hooks";
+import { IStudentFeeSummary } from "@/entities/fee";
+import { SelectOption } from "@/shared/types";
+import { toPaise } from "@/shared/lib";
 import {
   concessionSchema,
   ConcessionFormValues,
@@ -14,7 +15,7 @@ import {
   paymentSchema,
   PaymentFormValues,
 } from "../fees.schema";
-import { useDownloadFeeReceipt, useGrantConcession, useRecordPayment } from "../service/fees-service";
+import { useDownloadFeeReceipt, useGrantConcession, useRecordPayment } from "@/entities/fee";
 
 // a select option cannot have an empty value
 const ANY_INSTALLMENT = "any";

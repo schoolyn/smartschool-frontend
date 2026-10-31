@@ -3,9 +3,9 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-import { useError } from "@/hooks";
+import { useError } from "@/shared/lib/hooks";
 import { defaultPTMEventValues, ptmEventSchema, PTMEventFormValues } from "../ptm.schema";
-import { useCreatePTMEvent } from "../service/ptm-service";
+import { useCreatePTMEvent } from "@/entities/ptm";
 
 interface CreateEventDialogControllerProps {
   organizationId: string;
@@ -14,11 +14,19 @@ interface CreateEventDialogControllerProps {
   onClose: () => void;
 }
 
-const useCreateEventDialogController = ({ organizationId, academicYearId, open, onClose }: CreateEventDialogControllerProps) => {
+const useCreateEventDialogController = ({
+  organizationId,
+  academicYearId,
+  open,
+  onClose,
+}: CreateEventDialogControllerProps) => {
   const createEvent = useCreatePTMEvent(organizationId);
   useError({ mutation: createEvent });
 
-  const form = useForm<PTMEventFormValues>({ resolver: zodResolver(ptmEventSchema), defaultValues: defaultPTMEventValues });
+  const form = useForm<PTMEventFormValues>({
+    resolver: zodResolver(ptmEventSchema),
+    defaultValues: defaultPTMEventValues,
+  });
   const mode = useWatch({ control: form.control, name: "mode" });
 
   useEffect(() => {

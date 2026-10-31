@@ -1,5 +1,5 @@
-import CustomSelectDropdown from "@/components/custom-select";
-import { IAcademicYear } from "@/types";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import { IAcademicYear } from "@/entities/academics";
 
 // "which academic year am I looking at": every list below the Years tab is scoped to one
 const YearPicker = ({

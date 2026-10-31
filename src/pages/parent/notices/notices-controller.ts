@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { useGetMyNotices, useMarkNoticeRead } from "./service/notices-service";
+import { useGetMyNotices, useMarkNoticeRead } from "@/entities/notice";
 
 const useNoticesController = () => {
   const { t } = useTranslation();

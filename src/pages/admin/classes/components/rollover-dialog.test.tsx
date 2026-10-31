@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { pickDate } from "@/test/pick-date";
 
 import RolloverDialog from "./rollover-dialog";
 
@@ -9,11 +10,11 @@ const state = vi.hoisted(() => ({
   preview: { data: undefined as unknown, isLoading: false, isFetching: false, isError: false },
 }));
 
-vi.mock("../service/academics-service", () => ({
+vi.mock("@/entities/academics/api/academics-service", () => ({
   useGetRolloverPreview: () => state.preview,
   useRolloverAcademicYear: () => ({ mutate, isPending: false }),
 }));
-vi.mock("@/hooks", () => ({ useMutationFeedback: vi.fn() }));
+vi.mock("@/shared/lib/hooks", () => ({ useMutationFeedback: vi.fn() }));
 
 const years = [
   {
@@ -54,15 +55,15 @@ describe("RolloverDialog", () => {
     open();
 
     expect(screen.getByLabelText("New year name")).toHaveValue("2027-28");
-    expect(screen.getByLabelText("Starts")).toHaveValue("2027-04-01");
-    expect(screen.getByLabelText("Ends")).toHaveValue("2028-03-31");
+    expect(screen.getByLabelText("Starts")).toHaveTextContent("1 Apr 2027");
+    expect(screen.getByLabelText("Ends")).toHaveTextContent("31 Mar 2028");
   });
 
   it("says exactly what will be copied before anything happens", () => {
     open();
 
-    expect(screen.getByText("3 classes with 6 sections (active ones only)")).toBeInTheDocument();
-    expect(screen.getByText("9 subjects (active ones only)")).toBeInTheDocument();
+    expect(screen.getByText("3 class(es) with 6 section(s) (active ones only)")).toBeInTheDocument();
+    expect(screen.getByText("9 subject(s) (active ones only)")).toBeInTheDocument();
     expect(screen.getByText(/Students are not moved here/)).toBeInTheDocument();
     expect(screen.getByText(/teacher assignments are not copied/)).toBeInTheDocument();
   });
@@ -91,7 +92,7 @@ describe("RolloverDialog", () => {
     await user.click(screen.getByRole("button", { name: "Start 2027-2028" }));
 
     expect(mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "2027-2028", copyClasses: true, copySubjects: false }),
+      expect.objectContaining({ name: "2027-2028", copyClasses: true, copySubjects: false })
     );
   });
 
@@ -106,8 +107,7 @@ describe("RolloverDialog", () => {
   it("does not send a year that ends before it starts", async () => {
     open();
     const user = userEvent.setup();
-    await user.clear(screen.getByLabelText("Ends"));
-    await user.type(screen.getByLabelText("Ends"), "2027-01-01");
+    await pickDate(user, "Ends", "2027-01-01");
     await user.click(screen.getByRole("button", { name: "Start 2027-28" }));
 
     expect(await screen.findByText("The end date must be after the start date.")).toBeInTheDocument();

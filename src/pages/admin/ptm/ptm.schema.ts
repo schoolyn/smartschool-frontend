@@ -9,7 +9,10 @@ export const ptmEventSchema = z
     defaultMeetingLink: z.string().trim(),
     slotDurationMins: z
       .string()
-      .refine((value) => Number.isInteger(Number(value)) && Number(value) >= 5 && Number(value) <= 120, "Between 5 and 120 minutes."),
+      .refine(
+        (value) => Number.isInteger(Number(value)) && Number(value) >= 5 && Number(value) <= 120,
+        "Between 5 and 120 minutes."
+      ),
     sectionIds: z.array(z.string()).min(1, "Pick at least one section."),
   })
   .refine((value) => value.mode !== "online" || /^https?:\/\/\S+$/.test(value.defaultMeetingLink), {
@@ -40,4 +43,9 @@ export const slotWindowSchema = z
     message: "End must be after the start.",
   });
 export type SlotWindowFormValues = z.infer<typeof slotWindowSchema>;
-export const defaultSlotWindowValues: SlotWindowFormValues = { teacherUserId: "", sectionId: "", startAt: "", endAt: "" };
+export const defaultSlotWindowValues: SlotWindowFormValues = {
+  teacherUserId: "",
+  sectionId: "",
+  startAt: "",
+  endAt: "",
+};

@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 
-import CustomSelectDropdown from "@/components/custom-select";
-import SectionHeader from "@/components/section-header";
-import MarksSheetCard from "@/pages/admin/reports/components/marks-sheet-card";
-import { Card, CardTitle } from "@/components/ui/card";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import SectionHeader from "@/shared/ui/section-header";
+import { MarksSheetCard } from "@/features/marks-entry";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
 import useTeacherMarksController from "./marks-controller";
-import EmptyState from "@/components/empty-state";
+import EmptyState from "@/shared/ui/empty-state";
 
 const TeacherMarks = () => {
   const { organizationId = "" } = useParams();
@@ -18,7 +18,10 @@ const TeacherMarks = () => {
       <Card className="mb-6">
         <CardTitle className="mb-4 font-medium">Select exam, class, section &amp; subject</CardTitle>
         {!c.isLoading && c.examOptions.length === 0 ? (
-          <EmptyState title="No exams to enter marks for" description="Marks entry opens here once the school schedules an exam for a class you teach." />
+          <EmptyState
+            title="No exams to enter marks for"
+            description="Marks entry opens here once the school schedules an exam for a class you teach."
+          />
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <CustomSelectDropdown

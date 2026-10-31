@@ -1,15 +1,16 @@
-import ErrorState from "@/components/error-state";
+import ErrorState from "@/shared/ui/error-state";
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 
-import Spinner from "@/components/spinner";
-import EmptyState from "@/components/empty-state";
-import SectionHeader from "@/components/section-header";
-import CustomSelectDropdown from "@/components/custom-select";
+import Spinner from "@/shared/ui/spinner";
+import EmptyState from "@/shared/ui/empty-state";
+import SectionHeader from "@/shared/ui/section-header";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
 import { useHomeworkController } from "./homework-controller";
-import { SelectOption } from "@/types";
+import { SelectOption } from "@/shared/types";
 
 const ParentHomework = () => {
   const { children, studentId, setStudentId, homeworkList, isLoading, loadError, retryLoad } = useHomeworkController();
+  const childOptions = children.map((child): SelectOption => ({ id: child.studentId.id, name: child.studentId.name }));
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -21,11 +22,8 @@ const ParentHomework = () => {
           <div className="w-64">
             <CustomSelectDropdown
               placeholder="Select child"
-              options={children.map((child): SelectOption => ({ id: child.studentId.id, name: child.studentId.name }))}
-              value={(() => {
-                const child = children.find((child) => child.studentId.id === studentId);
-                return child ? { id: child.studentId.id, name: child.studentId.name } : null;
-              })()}
+              options={childOptions}
+              value={childOptions.find((option) => option.id === studentId) ?? null}
               onChange={(o) => setStudentId(String(o.id))}
             />
           </div>

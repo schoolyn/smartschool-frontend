@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useGetSubjects } from "../classes/service/academics-service";
-import { useSectionPicker } from "../classes/service/use-section-picker";
-import { useGetHomeworkList, useCreateHomework, useDeleteHomework } from "./service/homework-service";
+import { useGetSubjects } from "@/entities/academics";
+import { useSectionPicker } from "@/features/section-picker";
+import { useGetHomeworkList, useCreateHomework, useDeleteHomework } from "@/entities/homework";
 import { homeworkFormSchema, defaultHomeworkFormValues } from "./homework.schema";
 
 // shared by admins and teachers: the pickers offer a teacher only the sections they teach
@@ -22,10 +22,6 @@ export const useHomeworkController = () => {
   const homeworkList = useGetHomeworkList(organizationId, sectionId);
   const createHomework = useCreateHomework(organizationId, sectionId);
   const deleteHomework = useDeleteHomework(organizationId, sectionId);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    form.setValue("attachment", e.target.files?.[0] || null, { shouldValidate: true });
-  };
 
   const onSubmit = form.handleSubmit((values) => {
     if (!academicYearId || !classId || !sectionId) {
@@ -90,7 +86,6 @@ export const useHomeworkController = () => {
     setShowForm,
     toggleForm: () => setShowForm((open) => !open),
     form,
-    handleFileChange,
     onSubmit,
     handleDelete: setHomeworkIdPendingDelete,
     homeworkIdPendingDelete,

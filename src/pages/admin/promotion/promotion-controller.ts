@@ -1,200 +1,270 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useGetAcademicYears, useGetClasses, useGetSections } from "../classes/service/academics-service";
-import { useGetPromotionCandidates, useProcessPromotions } from "./service/promotion-service";
-import { PromotionAction } from "@/types";
+import { useGetAcademicYears, useGetClasses, useGetYearSections } from "@/entities/academics";
+import { useGetPromotionCandidates, useGetPromotionOverview, useProcessPromotions } from "@/entities/promotion";
+import { useSchoolRun } from "./school-run-controller";
+import { IPromotionCandidate } from "@/entities/promotion";
+import { ISection } from "@/entities/academics";
+import {
+  LANES,
+  Lane,
+  classAfter,
+  inSchoolOrder,
+  nextYearOf,
+  planSchoolRun,
+  rollNumbersFor,
+  sectionIn,
+  startLane,
+} from "./promotion.utils";
 
-interface RowState {
-  action: PromotionAction;
-  rollNumber: string;
+// the two lanes that land in a class of the next year
+export type Placed = "promote" | "detain";
+export type LeaveAction = "transfer" | "withdraw";
+interface Destination {
+  classId?: string;
+  sectionId?: string;
 }
-
-const defaultActionFor = (promotionStatus?: string): PromotionAction =>
-  promotionStatus === "fail" ? "detain" : "promote";
+export interface Outcome {
+  name: string;
+  lane: Lane;
+  success: boolean;
+  message?: string;
+}
 
 export const usePromotionController = () => {
   const { organizationId = "" } = useParams();
 
-  const [sourceAcademicYearId, setSourceAcademicYearId] = useState("");
-  const [sourceClassId, setSourceClassId] = useState("");
+  const years = useGetAcademicYears(organizationId).data?.items || [];
+  const [pickedSourceYearId, setPickedSourceYearId] = useState("");
+  const [pickedTargetYearId, setPickedTargetYearId] = useState("");
   const [sourceSectionId, setSourceSectionId] = useState("");
-
-  const [targetAcademicYearId, setTargetAcademicYearId] = useState("");
-  const [targetClassId, setTargetClassId] = useState("");
-  const [targetSectionId, setTargetSectionId] = useState("");
-  // detained students repeat a class, so they go into a (usually lower) class of the target year too
-  const [detainClassId, setDetainClassId] = useState("");
-  const [detainSectionId, setDetainSectionId] = useState("");
+  // only what the user changed is kept; everything else follows the smart defaults
+  const [moved, setMoved] = useState<Record<string, Lane>>({});
+  const [pickedDestination, setPickedDestination] = useState<Partial<Record<Placed, Destination>>>({});
+  const [leaveAction, setLeaveAction] = useState<LeaveAction>("transfer");
   const [confirmOpen, setConfirmOpen] = useState(false);
-  // kept apart from the list: promoted students leave the section, and their outcome must still show
-  const [lastRun, setLastRun] = useState<{ name: string; action: PromotionAction; success: boolean; message?: string }[]>([]);
+  const [lastRun, setLastRun] = useState<Outcome[]>([]);
 
-  const [rowsState, setRowsState] = useState<Record<string, RowState>>({});
-  const [resultsByStudent, setResultsByStudent] = useState<Record<string, { success: boolean; message?: string }>>({});
+  const sourceYearId = pickedSourceYearId || years.find((year) => year.isCurrent)?.id || "";
+  const targetYear = years.find((year) => year.id === pickedTargetYearId) ?? nextYearOf(years, sourceYearId);
+  const targetYearId = targetYear?.id || "";
 
-  const academicYears = useGetAcademicYears(organizationId);
-  const sourceClasses = useGetClasses(organizationId, sourceAcademicYearId);
-  const sourceSections = useGetSections(organizationId, sourceClassId);
-  const targetClasses = useGetClasses(organizationId, targetAcademicYearId, "active");
-  const targetSections = useGetSections(organizationId, targetClassId, "active");
-  const detainSections = useGetSections(organizationId, detainClassId, "active");
-
-  const candidates = useGetPromotionCandidates(organizationId, sourceAcademicYearId, sourceSectionId);
+  const sourceClasses = useGetClasses(organizationId, sourceYearId).data?.items || [];
+  const sourceSections = useGetYearSections(organizationId, sourceYearId).data?.items || [];
+  const targetClasses = useGetClasses(organizationId, targetYearId, "active").data?.items || [];
+  const targetSections = useGetYearSections(organizationId, targetYearId).data?.items || [];
+  const candidatesQuery = useGetPromotionCandidates(organizationId, sourceYearId, sourceSectionId);
   const processPromotions = useProcessPromotions(organizationId);
+  const candidates = candidatesQuery.data?.items || [];
+  const overview = useGetPromotionOverview(organizationId, sourceYearId);
+  const stats = new Map((overview.data?.items || []).map((row) => [row.sectionId, row]));
 
-  useEffect(() => {
-    if (!candidates.data?.items) return;
-    setRowsState((prev) => {
-      const next = { ...prev };
-      for (const item of candidates.data!.items) {
-        if (!next[item.student.id]) {
-          next[item.student.id] = {
-            action: defaultActionFor(item.result?.promotionStatus),
-            rollNumber: item.rollNumber,
-          };
-        }
-      }
-      return next;
-    });
-  }, [candidates.data]);
+  const classById = (id?: string) => [...sourceClasses, ...targetClasses].find((klass) => klass.id === id);
+  const sourceSection = sourceSections.find((section) => section.id === sourceSectionId);
+  const sourceClass = classById(sourceSection?.classId);
+  // nothing above this class in the school: passing students leave instead of moving up
+  const ordered = inSchoolOrder(sourceClasses);
+  // a switched-off class never counts as the next or final one
+  const activeSourceClasses = sourceClasses.filter((klass) => klass.status !== "inactive");
+  const isFinalClass = !!sourceClass && inSchoolOrder(activeSourceClasses).at(-1)?.id === sourceClass.id;
+  const placeOf = (classId: string) => ordered.findIndex((klass) => klass.id === classId);
 
-  // outcomes belong to one section's run, so they are cleared only when the section changes
-  useEffect(() => {
-    setResultsByStudent({});
-    setLastRun([]);
-  }, [sourceSectionId]);
+  // the school map: every class in order, its sections with their progress
+  const mapRows = ordered.map((klass) => ({
+    klass,
+    sections: sourceSections
+      .filter((section) => section.classId === klass.id)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((section) => ({ section, stats: stats.get(section.id) })),
+  }));
+  const plan = planSchoolRun({
+    sourceClasses: activeSourceClasses,
+    sourceSections,
+    targetClasses,
+    targetSections,
+    stats,
+  });
+  const schoolRun = useSchoolRun({ organizationId, sourceYearId, targetYearId, plan });
 
-  const setSourceAcademicYear = (id: string) => {
-    setSourceAcademicYearId(id);
-    setSourceClassId("");
-    setSourceSectionId("");
-  };
-  const setSourceClass = (id: string) => {
-    setSourceClassId(id);
-    setSourceSectionId("");
-  };
-  const setTargetAcademicYear = (id: string) => {
-    setTargetAcademicYearId(id);
-    setTargetClassId("");
-    setTargetSectionId("");
-    setDetainClassId("");
-    setDetainSectionId("");
-  };
-  const setDetainClass = (id: string) => {
-    setDetainClassId(id);
-    setDetainSectionId("");
-  };
-  const setTargetClass = (id: string) => {
-    setTargetClassId(id);
-    setTargetSectionId("");
-  };
+  const sourceOptions = [...sourceSections]
+    .sort((a, b) => placeOf(a.classId) - placeOf(b.classId) || a.name.localeCompare(b.name))
+    .map((section) => ({
+      id: section.id,
+      name: `${classById(section.classId)?.name ?? "Class"} · ${section.name}`,
+      description: `${section.studentCount ?? 0} student(s)`,
+    }));
 
-  const setRowAction = (studentId: string, action: PromotionAction) => {
-    setRowsState((prev) => ({ ...prev, [studentId]: { ...prev[studentId], action } }));
+  const defaultDestination = (lane: Placed): Destination => {
+    const klass = classAfter(activeSourceClasses, targetClasses, sourceClass, lane === "promote" ? 1 : 0);
+    return { classId: klass?.id, sectionId: sectionIn(targetSections, klass?.id, sourceSection?.name)?.id };
   };
-  const setRowRollNumber = (studentId: string, rollNumber: string) => {
-    setRowsState((prev) => ({ ...prev, [studentId]: { ...prev[studentId], rollNumber } }));
-  };
+  const destinationOf = (lane: Placed) => pickedDestination[lane] ?? defaultDestination(lane);
+  const destinationSection = (lane: Placed) =>
+    targetSections.find((section) => section.id === destinationOf(lane).sectionId);
 
-  const actionOf = (studentId: string): PromotionAction => rowsState[studentId]?.action || "promote";
-  const counts = (candidates.data?.items || []).reduce(
-    (acc, item) => ({ ...acc, [actionOf(item.student.id)]: (acc[actionOf(item.student.id)] || 0) + 1 }),
-    {} as Partial<Record<PromotionAction, number>>
+  const laneOf = (candidate: IPromotionCandidate) => moved[candidate.student.id] ?? startLane(candidate, isFinalClass);
+  const lanes = Object.fromEntries(
+    LANES.map(({ key }) => [key, candidates.filter((candidate) => laneOf(candidate) === key)])
+  ) as Record<Lane, IPromotionCandidate[]>;
+  // pass out only makes sense from the final class, unless someone was moved there by hand
+  const visibleLanes = LANES.filter(({ key }) => key !== "pass_out" || isFinalClass || lanes.pass_out.length);
+
+  const rollNumbers = (["promote", "detain"] as Placed[]).reduce<Record<string, string>>(
+    (all, lane) => ({
+      ...all,
+      ...rollNumbersFor(
+        lanes[lane].map(({ student }) => student),
+        destinationSection(lane)?.studentCount ?? 0
+      ),
+    }),
+    {}
   );
 
-  // checks the destinations, then asks for confirmation: these changes cannot be undone from here
-  const handleProcess = () => {
-    if (!candidates.data?.items.length) return;
-    if (counts.promote && (!targetAcademicYearId || !targetClassId || !targetSectionId)) {
-      toast.error("Select the target year, class and section for promoted students.");
-      return;
-    }
-    if (counts.detain && (!targetAcademicYearId || !detainClassId || !detainSectionId)) {
-      toast.error("Select the class and section in the target year for detained students.");
-      return;
-    }
-    setConfirmOpen(true);
+  const seatsOf = (lane: Placed) => {
+    const section = destinationSection(lane);
+    const taken = (section?.studentCount ?? 0) + lanes[lane].length;
+    return { taken, capacity: section?.capacity, full: !!section?.capacity && taken > section.capacity };
   };
 
-  const confirmProcess = () => {
-    const items = candidates.data?.items || [];
-    const decisions = items.map((item) => {
-      const action = actionOf(item.student.id);
-      if (action === "promote" || action === "detain") {
-        return {
-          studentId: item.student.id,
-          action,
-          academicYearId: targetAcademicYearId,
-          classId: action === "promote" ? targetClassId : detainClassId,
-          sectionId: action === "promote" ? targetSectionId : detainSectionId,
-          rollNumber: rowsState[item.student.id]?.rollNumber || item.rollNumber,
-        };
-      }
-      return { studentId: item.student.id, action };
-    });
+  // why the board can't be applied yet, if anything stops it
+  const blockerOf = () => {
+    const placing = (["promote", "detain"] as Placed[]).filter((lane) => lanes[lane].length);
+    if (placing.length && !targetYearId) return "Add next academic year first, so students have somewhere to go.";
+    const missing = placing.find((lane) => !destinationOf(lane).sectionId);
+    if (missing)
+      return `Choose the class and section for the ${missing === "promote" ? "promoted" : "repeating"} students.`;
+    const full = placing.find((lane) => seatsOf(lane).full);
+    if (full) return `The ${full === "promote" ? "promotion" : "repeat"} section is over capacity.`;
+    return "";
+  };
+  const blocker = blockerOf();
+  const decidedCount = candidates.length - lanes.decide.length;
 
-    processPromotions.mutate(decisions, {
+  const resetBoard = () => {
+    setMoved({});
+    setPickedDestination({});
+    setLastRun([]);
+  };
+  const pickSourceYear = (id: string) => {
+    setPickedSourceYearId(id);
+    setPickedTargetYearId("");
+    setSourceSectionId("");
+    resetBoard();
+  };
+  const pickSourceSection = (id: string) => {
+    setSourceSectionId(id);
+    resetBoard();
+  };
+  const pickTargetYear = (id: string) => {
+    setPickedTargetYearId(id);
+    setPickedDestination({});
+  };
+  const pickDestinationClass = (lane: Placed, classId: string) =>
+    setPickedDestination((prev) => ({
+      ...prev,
+      [lane]: { classId, sectionId: sectionIn(targetSections, classId, sourceSection?.name)?.id },
+    }));
+  const pickDestinationSection = (lane: Placed, sectionId: string) =>
+    setPickedDestination((prev) => ({ ...prev, [lane]: { ...destinationOf(lane), sectionId } }));
+
+  const moveTo = (studentIds: string[], lane: Lane) =>
+    setMoved((prev) => ({ ...prev, ...Object.fromEntries(studentIds.map((id) => [id, lane])) }));
+  const moveAll = (from: Lane, to: Lane) =>
+    moveTo(
+      lanes[from].map(({ student }) => student.id),
+      to
+    );
+
+  const decisionFor = (candidate: IPromotionCandidate) => {
+    const lane = laneOf(candidate);
+    const studentId = candidate.student.id;
+    if (lane === "promote" || lane === "detain") {
+      const { classId, sectionId } = destinationOf(lane);
+      return {
+        studentId,
+        action: lane,
+        academicYearId: targetYearId,
+        classId,
+        sectionId,
+        rollNumber: rollNumbers[studentId],
+      };
+    }
+    return { studentId, action: lane === "leave" ? leaveAction : ("pass_out" as const) };
+  };
+
+  const apply = () => {
+    const deciding = candidates.filter((candidate) => laneOf(candidate) !== "decide");
+    processPromotions.mutate(deciding.map(decisionFor), {
       onSuccess: (data) => {
-        const map: Record<string, { success: boolean; message?: string }> = {};
-        for (const r of data.items) map[r.studentId] = { success: r.success, message: r.message };
-        setResultsByStudent(map);
-        setLastRun(
-          items.map((item) => ({
-            name: item.student.name,
-            action: actionOf(item.student.id),
-            success: map[item.student.id]?.success ?? false,
-            message: map[item.student.id]?.message,
-          }))
-        );
+        const byStudent = new Map(data.items.map((item) => [item.studentId, item]));
+        const outcomes = deciding.map((candidate) => ({
+          name: candidate.student.name,
+          lane: laneOf(candidate),
+          success: byStudent.get(candidate.student.id)?.success ?? false,
+          message: byStudent.get(candidate.student.id)?.message,
+        }));
+        setLastRun(outcomes);
         setConfirmOpen(false);
-        const failedCount = data.items.filter((r) => !r.success).length;
-        if (failedCount === 0) toast.success("All students processed successfully.");
-        else toast.error(`${failedCount} of ${data.items.length} failed, see details below.`);
+        const failed = outcomes.filter((outcome) => !outcome.success).length;
+        if (failed) toast.error(`${failed} of ${outcomes.length} could not be moved, see below.`);
+        else toast.success(`${outcomes.length} student(s) moved.`);
       },
       onError: (error) => {
         setConfirmOpen(false);
-        toast.error(error?.response?.Error?.message || "Failed to process promotions");
+        toast.error(error?.response?.Error?.message || "Could not apply the promotion");
       },
     });
   };
 
+  const placeLabel = (lane: Placed) => {
+    const section: ISection | undefined = destinationSection(lane);
+    return section ? `${classById(section.classId)?.name ?? ""} · ${section.name}` : "";
+  };
+
   return {
-    academicYears: academicYears.data?.items || [],
-    sourceAcademicYearId,
-    setSourceAcademicYear,
-    sourceClasses: sourceClasses.data?.items || [],
-    sourceClassId,
-    setSourceClass,
-    sourceSections: sourceSections.data?.items || [],
+    mapRows,
+    isLoadingMap: overview.isLoading,
+    mapError: overview.isError,
+    retryMap: overview.refetch,
+    plan,
+    schoolRun,
+    classNameOf: (id: string) => classById(id)?.name ?? "",
+    years,
+    sourceYearId,
+    pickSourceYear,
+    sourceOptions,
     sourceSectionId,
-    setSourceSectionId,
-    targetAcademicYearId,
-    setTargetAcademicYear,
-    targetClasses: targetClasses.data?.items || [],
-    targetClassId,
-    setTargetClass,
-    targetSections: targetSections.data?.items || [],
-    targetSectionId,
-    setTargetSectionId,
-    detainClassId,
-    setDetainClass,
-    detainSections: detainSections.data?.items || [],
-    detainSectionId,
-    setDetainSectionId,
-    counts,
+    pickSourceSection,
+    sourceLabel: sourceOptions.find((option) => option.id === sourceSectionId)?.name ?? "",
+    targetYear,
+    pickTargetYear,
+    targetClasses,
+    targetSections,
+    destinationOf,
+    pickDestinationClass,
+    pickDestinationSection,
+    placeLabel,
+    seatsOf,
+    leaveAction,
+    setLeaveAction,
+    isFinalClass,
+    candidates,
+    isLoading: candidatesQuery.isLoading,
+    lanes,
+    visibleLanes,
+    rollNumbers,
+    moveTo,
+    moveAll,
+    blocker,
+    decidedCount,
     confirmOpen,
     setConfirmOpen,
-    confirmProcess,
+    apply,
+    isApplying: processPromotions.isPending,
     lastRun,
-    candidates: candidates.data?.items || [],
-    isLoadingCandidates: candidates.isLoading,
-    rowsState,
-    setRowAction,
-    setRowRollNumber,
-    resultsByStudent,
-    handleProcess,
-    isProcessing: processPromotions.isPending,
   };
 };
+
+export type PromotionController = ReturnType<typeof usePromotionController>;

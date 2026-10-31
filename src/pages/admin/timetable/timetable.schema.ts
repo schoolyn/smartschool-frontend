@@ -14,4 +14,11 @@ export const periodSchema = z
     message: "End must be after the start.",
   });
 export type PeriodFormValues = z.infer<typeof periodSchema>;
-export const defaultPeriodValues: PeriodFormValues = { teacherUserId: "", subjectId: "", days: [], startTime: "", endTime: "", room: "" };
+export const defaultPeriodValues: PeriodFormValues = {
+  teacherUserId: "",
+  subjectId: "",
+  days: [],
+  startTime: "",
+  endTime: "",
+  room: "",
+};

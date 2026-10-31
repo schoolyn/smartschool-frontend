@@ -1,0 +1,4 @@
+# dependencies whose install scripts may run
+onlyBuiltDependencies:
+  - esbuild
+  - fsevents

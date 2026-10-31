@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useMutationFeedback } from "@/hooks";
-import { ITeacherAssignment } from "@/types";
+import { useMutationFeedback } from "@/shared/lib/hooks";
+import { ITeacherAssignment } from "@/entities/academics";
 import {
   useAssignTeacher,
   useGetClasses,
@@ -11,8 +11,8 @@ import {
   useGetSubjects,
   useGetTeacherAssignments,
   useRemoveTeacherAssignment,
-} from "../service/academics-service";
-import { useGetAllTeachers } from "../service/teachers-service";
+} from "@/entities/academics";
+import { useGetAllTeachers } from "@/entities/academics";
 import { assignFormSchema, AssignFormValues, defaultAssignFormValues } from "../classes.schema";
 
 const useAssignmentsTabController = (organizationId: string, yearId: string) => {
@@ -61,13 +61,16 @@ const useAssignmentsTabController = (organizationId: string, yearId: string) => 
   // removed assignments are kept by the server as history; the list shows only the ones in force
   const items = useMemo(
     () => (assignments.data?.items ?? []).filter((item) => item.status === "active"),
-    [assignments.data],
+    [assignments.data]
   );
 
   const teacherOptions = useMemo(
     () =>
-      (teachers.data?.items ?? []).map((teacher) => ({ id: teacher.userId, name: `${teacher.name} (${teacher.email})` })),
-    [teachers.data],
+      (teachers.data?.items ?? []).map((teacher) => ({
+        id: teacher.userId,
+        name: `${teacher.name} (${teacher.email})`,
+      })),
+    [teachers.data]
   );
 
   return {

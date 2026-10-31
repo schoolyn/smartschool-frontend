@@ -1,6 +1,6 @@
-import { DataTableColumn } from "@/components/data-table";
-import RowMenu from "@/components/row-menu";
-import { ITeacherAssignment } from "@/types";
+import { DataTableColumn } from "@/shared/ui/data-table";
+import RowMenu from "@/shared/ui/row-menu";
+import { ITeacherAssignment } from "@/entities/academics";
 
 export const ROLE_OPTIONS = [
   { id: "SUBJECT_TEACHER", name: "Subject teacher" },
@@ -8,7 +8,9 @@ export const ROLE_OPTIONS = [
 ];
 const ROLE_LABELS: Record<string, string> = Object.fromEntries(ROLE_OPTIONS.map((role) => [role.id, role.name]));
 
-export const assignmentColumns = (remove: (item: ITeacherAssignment) => void): DataTableColumn<ITeacherAssignment>[] => [
+export const assignmentColumns = (
+  remove: (item: ITeacherAssignment) => void
+): DataTableColumn<ITeacherAssignment>[] => [
   {
     id: "teacher",
     header: "Teacher",
@@ -16,7 +18,12 @@ export const assignmentColumns = (remove: (item: ITeacherAssignment) => void): D
   },
   { id: "class", header: "Class", meta: { align: "center" }, cell: ({ row }) => row.original.classId?.name },
   { id: "section", header: "Section", meta: { align: "center" }, cell: ({ row }) => row.original.sectionId?.name },
-  { id: "subject", header: "Subject", meta: { align: "center" }, cell: ({ row }) => row.original.subjectId?.name || "-" },
+  {
+    id: "subject",
+    header: "Subject",
+    meta: { align: "center" },
+    cell: ({ row }) => row.original.subjectId?.name || "-",
+  },
   {
     id: "role",
     header: "Role",

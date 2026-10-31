@@ -4,7 +4,7 @@ import AuthHeading from "../../components/auth-heading";
 import AuthLayout from "../../components/auth-layout";
 import AuthSubmitButton from "../../components/auth-submit-button";
 import useForgotPasswordEmailController from "./forgot-password-email-controller";
-import { IForgotPassword } from "@/types";
+import { IForgotPassword } from "@/entities/session";
 
 const ForgotPasswordEmail: React.FC<IForgotPassword> = ({ email }) => {
   const { t, redirectToLogin } = useForgotPasswordEmailController();

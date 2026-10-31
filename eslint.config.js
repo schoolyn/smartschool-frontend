@@ -28,7 +28,6 @@ export default tseslint.config(
             "useFormField",
             "useAuth",
             "useNotifications",
-            "usePageHeaderContext",
             "useTenant",
             "useCurrentRole",
             "useAreaBase",
@@ -39,5 +38,30 @@ export default tseslint.config(
         },
       ],
     },
-  }
+  },
+  // Feature-Sliced Design: a layer imports only from layers below it, and only through a slice's public index.ts
+  ...[
+    ["shared", ["entities", "features", "widgets", "pages", "app"]],
+    ["entities", ["features", "widgets", "pages", "app"]],
+    ["features", ["widgets", "pages", "app"]],
+    ["widgets", ["pages", "app"]],
+    ["pages", ["app"]],
+    ["app", []],
+  ].map(([layer, above]) => ({
+    files: [`src/${layer}/**/*.{ts,tsx}`],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...above.map((name) => ({ group: [`@/${name}/*`], message: `${layer} can't import from ${name}.` })),
+            {
+              group: ["@/entities/*/*", "@/features/*/*", "@/widgets/*/*"],
+              message: "Import a slice through its public index.ts, e.g. @/entities/student.",
+            },
+          ],
+        },
+      ],
+    },
+  }))
 );

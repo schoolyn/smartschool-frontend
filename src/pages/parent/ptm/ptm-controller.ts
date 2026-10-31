@@ -10,13 +10,15 @@ import {
   useBookPTMSlot,
   useCancelPTMBooking,
   useGetMyPTMBookings,
-} from "@/pages/admin/ptm/service/ptm-service";
-import { useGetMyChildren } from "./service/my-children-service";
-import { useError } from "@/hooks";
-import { IPTMSlot, SelectOption } from "@/types";
+} from "@/entities/ptm";
+import { useGetMyChildren } from "@/entities/student";
+import { useError } from "@/shared/lib/hooks";
+import { IPTMSlot } from "@/entities/ptm";
+import { SelectOption } from "@/shared/types";
 import { bookingSchema, BookingFormValues, defaultBookingValues } from "./ptm.schema";
 
 const teacherNameOf = (slot: IPTMSlot) => (typeof slot.teacherUserId === "object" ? slot.teacherUserId.name : "");
+const idOf = (ref: { id: string } | string | undefined) => (typeof ref === "object" ? ref.id : ref);
 
 const useParentPTMController = () => {
   const { organizationId } = useParams();
@@ -45,10 +47,23 @@ const useParentPTMController = () => {
   const children = getMyChildren.data?.items || [];
   const bookings = getMyBookings.data?.items || [];
 
-  // a slot belongs to one section, so only the children in that section can be booked into it
+  // the teachers each child already meets in this event: only one slot per teacher per child is allowed
+  const bookedWith = new Set(
+    bookings
+      .filter(
+        (b) => b.status !== "cancelled" && typeof b.slotId === "object" && b.slotId.ptmEventId === selectedEventId
+      )
+      .map((b) => `${idOf(b.studentId)}:${typeof b.slotId === "object" ? idOf(b.slotId.teacherUserId) : ""}`)
+  );
+
+  // a slot belongs to one section, so only the children in that section who aren't booked with its teacher can take it
   const childrenForSlot = (slotId: string) => {
     const slot = slots.find((s) => s.id === slotId);
-    return children.filter((c) => c.studentId.currentEnrollment?.sectionId?.id === slot?.sectionId);
+    return children.filter(
+      (c) =>
+        c.studentId.currentEnrollment?.sectionId?.id === slot?.sectionId &&
+        !bookedWith.has(`${c.studentId.id}:${idOf(slot?.teacherUserId)}`)
+    );
   };
   const bookingChildren = bookingSlotId ? childrenForSlot(bookingSlotId) : [];
   const bookingSlot = slots.find((s) => s.id === bookingSlotId);
@@ -60,6 +75,7 @@ const useParentPTMController = () => {
     teacherName: teacherNameOf(slot),
     time: new Date(slot.startAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     full: slot.bookedCount >= slot.capacity,
+    alreadyBooked: childrenForSlot(slot.id).length === 0,
   }));
 
   const eventOptions: SelectOption[] = events.map((event) => ({

@@ -1,14 +1,15 @@
-import ErrorState from "@/components/error-state";
-import PageLoader from "@/components/page-loader";
-import { TextField } from "@/components/form-fields";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
+import ErrorState from "@/shared/ui/error-state";
+import PageLoader from "@/shared/ui/page-loader";
+import { TextField } from "@/shared/ui/form-fields";
+import { Badge } from "@/shared/ui/kit/badge";
+import { Button } from "@/shared/ui/kit/button";
+import { Form } from "@/shared/ui/kit/form";
+import { Switch } from "@/shared/ui/kit/switch";
 import useOnlinePaymentsController from "./online-payments-controller";
 
 const OnlinePayments = () => {
-  const { settings, data, connected, form, submit, isSaving, toggle, webhookUrl, copyWebhook } = useOnlinePaymentsController();
+  const { settings, data, connected, form, submit, isSaving, toggle, webhookUrl, copyWebhook } =
+    useOnlinePaymentsController();
 
   if (settings.isLoading) return <PageLoader />;
   if (settings.isError) return <ErrorState error={settings.error} onRetry={() => settings.refetch()} />;
@@ -25,22 +26,29 @@ const OnlinePayments = () => {
               {data.keyId.startsWith("rzp_test_") && <Badge tone="yellow">Test mode</Badge>}
             </div>
             <p className="mt-1 text-sm text-gray-500">
-              Parents pay from the app with UPI, cards or net banking, straight into your school&apos;s Razorpay account. Each payment gets a
-              receipt and shows in the ledger and reports, like any other payment. Razorpay&apos;s charge comes out of what the school receives.
+              Parents pay from the app with UPI, cards or net banking, straight into your school&apos;s Razorpay
+              account. Each payment gets a receipt and shows in the ledger and reports, like any other payment.
+              Razorpay&apos;s charge comes out of what the school receives.
             </p>
           </div>
           <Switch checked={data.enabled} disabled={!connected || isSaving} onCheckedChange={toggle} />
         </div>
-        {!connected && <p className="mt-3 text-sm text-amber-700">Connect your Razorpay account below to turn this on.</p>}
+        {!connected && (
+          <p className="mt-3 text-sm text-amber-700">Connect your Razorpay account below to turn this on.</p>
+        )}
       </div>
 
       <div className="rounded-lg bg-white p-6 shadow">
         <p className="text-sm font-medium text-gray-900">Razorpay account</p>
         <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-gray-600">
-          <li>In the Razorpay dashboard, open Account &amp; Settings, then API Keys, and generate a key. Paste the key id and secret here.</li>
           <li>
-            Under Webhooks, add the address below, choose the events <span className="font-medium">payment.captured</span> and{" "}
-            <span className="font-medium">order.paid</span>, set a secret, and paste that secret here too.
+            In the Razorpay dashboard, open Account &amp; Settings, then API Keys, and generate a key. Paste the key id
+            and secret here.
+          </li>
+          <li>
+            Under Webhooks, add the address below, choose the events{" "}
+            <span className="font-medium">payment.captured</span> and <span className="font-medium">order.paid</span>,
+            set a secret, and paste that secret here too.
           </li>
           <li>Save. The keys are checked with Razorpay first, then stored encrypted. They are never shown again.</li>
         </ol>

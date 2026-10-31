@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { IAddGuardianValue } from "@/types";
+import { IAddGuardianValue } from "@/entities/student";
 import { guardianFormSchema, defaultGuardianFormValues, GuardianFormValues } from "./guardian-modal.schema";
 
 const useGuardianModalController = (isOpen: boolean, onSubmit: (value: IAddGuardianValue) => void) => {

@@ -1,37 +1,39 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useTabParam } from "@/shared/lib/hooks";
 import toast from "react-hot-toast";
 
-import { useSectionPicker } from "../classes/service/use-section-picker";
+import { useSectionPicker } from "@/features/section-picker";
 import {
   useGetSectionRoster,
   useGetSectionAttendance,
   useMarkAttendance,
   useGetSectionAttendanceReport,
   ISectionAttendanceReportRow,
-} from "./service/attendance-service";
-import { useGetCalendarMonth } from "../calendar/service/calendar-service";
-import { AttendanceStatus } from "@/types";
-import { exportToCsv, localDateString } from "@/utils";
+} from "@/entities/attendance";
+import { useGetCalendarMonth } from "@/entities/calendar";
+import { AttendanceStatus } from "@/entities/attendance";
+import { exportToCsv, localDateString } from "@/shared/lib";
 
 const today = () => localDateString();
 const firstOfMonth = () => `${today().slice(0, 7)}-01`;
 
-type Tab = "mark" | "report" | "register";
+const ATTENDANCE_TABS = ["mark", "report", "register"] as const;
+export type AttendanceTabKey = (typeof ATTENDANCE_TABS)[number];
 
-export const percent = (row: ISectionAttendanceReportRow) => (row.total ? ((row.present / row.total) * 100).toFixed(1) : "0");
+export const percent = (row: ISectionAttendanceReportRow) =>
+  row.total ? ((row.present / row.total) * 100).toFixed(1) : "0";
 
 const useAttendanceController = () => {
   const { organizationId = "" } = useParams();
 
-  const [activeTab, setActiveTab] = useState<Tab>("mark");
+  const [activeTab, setActiveTab] = useTabParam(ATTENDANCE_TABS, "mark");
   const [date, setDate] = useState(today());
   const [reportFrom, setReportFrom] = useState(firstOfMonth());
   const [reportTo, setReportTo] = useState(today());
   const [registerMonth, setRegisterMonth] = useState(today().slice(0, 7));
 
-  // admins pick from the whole school, teachers from their own sections; the reports cover past records, so they also
-  // list classes and sections that have since been switched off
+  // admins pick from the whole school, teachers their own sections; reports also list since-disabled ones
   const picker = useSectionPicker(organizationId, { includeInactive: activeTab !== "mark" });
   const { academicYearId, classId, sectionId, setSectionId } = picker;
   const roster = useGetSectionRoster(organizationId, sectionId);
@@ -65,17 +67,6 @@ const useAttendanceController = () => {
     setReasons(nextReasons);
   }, [existing.data]);
 
-  // attendance can only be marked in active classes, so an inactive pick from the report is cleared
-  const changeTab = (tab: Tab) => {
-    if (tab === "mark") {
-      const klass = picker.classes.find((item) => item.id === classId);
-      const section = picker.sections.find((item) => item.id === sectionId);
-      if (klass?.status === "inactive") picker.setClassId("");
-      else if (section?.status === "inactive") setSectionId("");
-    }
-    setActiveTab(tab);
-  };
-
   const setStatus = (studentId: string, status: AttendanceStatus) => {
     setStatuses((prev) => ({ ...prev, [studentId]: status }));
     setIsDirty(true);
@@ -103,7 +94,9 @@ const useAttendanceController = () => {
 
   const visibleStudents = useMemo(() => {
     const term = rosterSearch.trim().toLowerCase();
-    return term ? students.filter((s) => `${s.name} ${s.currentEnrollment?.rollNumber ?? ""}`.toLowerCase().includes(term)) : students;
+    return term
+      ? students.filter((s) => `${s.name} ${s.currentEnrollment?.rollNumber ?? ""}`.toLowerCase().includes(term))
+      : students;
   }, [students, rosterSearch]);
 
   const exportRoster = () =>
@@ -158,7 +151,7 @@ const useAttendanceController = () => {
 
   return {
     activeTab,
-    setActiveTab: changeTab,
+    setActiveTab,
     reportFrom,
     setReportFrom,
     reportTo,

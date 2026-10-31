@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
-import BrandLogo from "@/components/brand-logo";
-import { cn } from "@/lib/utils";
+import { BrandLogo } from "@/features/theme";
+import { cn } from "@/shared/lib/utils";
 import AuthBanner from "./auth-banner";
 import AuthShowcase from "./auth-showcase";
 

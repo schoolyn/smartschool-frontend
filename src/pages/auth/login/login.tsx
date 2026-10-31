@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import ButtonSpinner from "@/icons/button-spinner";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/kit/form";
+import { Input } from "@/shared/ui/kit/input";
+import { PasswordInput } from "@/shared/ui/kit/password-input";
+import ButtonSpinner from "@/shared/ui/icons/button-spinner";
 import AuthHeading from "../components/auth-heading";
 import AuthLayout from "../components/auth-layout";
 import AuthSubmitButton from "../components/auth-submit-button";

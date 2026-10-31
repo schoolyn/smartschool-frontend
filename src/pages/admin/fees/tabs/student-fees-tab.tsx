@@ -1,10 +1,10 @@
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import EmptyState from "@/components/empty-state";
-import ErrorState from "@/components/error-state";
-import Spinner from "@/components/spinner";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import EmptyState from "@/shared/ui/empty-state";
+import ErrorState from "@/shared/ui/error-state";
+import Spinner from "@/shared/ui/spinner";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
+import { Input } from "@/shared/ui/kit/input";
+import { cn } from "@/shared/lib/utils";
 import StudentFeeCard from "../components/student-fee-card";
 import useStudentFeesController from "./student-fees-controller";
 
@@ -46,26 +46,45 @@ const StudentFeesTab = ({ organizationId }: { organizationId: string }) => {
           {c.students.length || c.debouncedSearch ? (
             <EmptyState
               title={c.students.length ? "Pick a student" : "No matching students"}
-              description={c.students.length ? "Search above and choose a student to see their fees and record payments." : `No student matches "${c.debouncedSearch}".`}
+              description={
+                c.students.length
+                  ? "Search above and choose a student to see their fees and record payments."
+                  : `No student matches "${c.debouncedSearch}".`
+              }
             />
           ) : (
-            <EmptyState title="No students yet" description="Add students first; their fees and payments are managed here." />
+            <EmptyState
+              title="No students yet"
+              description="Add students first; their fees and payments are managed here."
+            />
           )}
         </Card>
       )}
 
       {c.studentId &&
         (c.summaryError ? (
-          <ErrorState error={c.summaryError} title="This student's fees could not be loaded." onRetry={c.retrySummary} />
+          <ErrorState
+            error={c.summaryError}
+            title="This student's fees could not be loaded."
+            onRetry={c.retrySummary}
+          />
         ) : c.isLoadingSummary ? (
           <Spinner />
         ) : c.summaries.length === 0 ? (
           <Card>
-            <EmptyState title="No fees assigned yet" description="Assign a fee structure to this student's class from the Fee Structures tab." />
+            <EmptyState
+              title="No fees assigned yet"
+              description="Assign a fee structure to this student's class from the Fee Structures tab."
+            />
           </Card>
         ) : (
           c.summaries.map((summary) => (
-            <StudentFeeCard key={summary.studentFeeId} organizationId={organizationId} summary={summary} onReverse={c.setPaymentToReverse} />
+            <StudentFeeCard
+              key={summary.studentFeeId}
+              organizationId={organizationId}
+              summary={summary}
+              onReverse={c.setPaymentToReverse}
+            />
           ))
         ))}
 

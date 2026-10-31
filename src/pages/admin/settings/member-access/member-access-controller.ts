@@ -4,21 +4,19 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useAuth } from "@/context/auth-context";
-import { useAreaBase, useCurrentRole } from "@/context/tenant-context";
-import { useError } from "@/hooks";
-import { AccountRole, PermissionKey } from "@/types";
+import { useAuth } from "@/entities/session";
+import { useAreaBase, useCurrentRole } from "@/entities/session";
+import { useError } from "@/shared/lib/hooks";
+import { AccountRole, PermissionKey } from "@/shared/types";
 import {
-  MemberAccessValues,
-  ROLE_OPTIONS,
-  StaffRole,
-  memberAccessSchema,
+  type StaffRole,
   useAccessCatalog,
   useMemberAccess,
   useReinviteMember,
   useSetMemberStatus,
   useUpdateMemberAccess,
-} from "../access";
+} from "@/entities/access";
+import { MemberAccessValues, ROLE_OPTIONS, memberAccessSchema } from "../access";
 
 const STAFF: MemberAccessValues["role"][] = ["teacher", "accountant", "staff"];
 
@@ -37,7 +35,10 @@ const useMemberAccessController = () => {
   useError({ mutation: setStatus });
   useError({ mutation: reinvite });
 
-  const form = useForm<MemberAccessValues>({ resolver: zodResolver(memberAccessSchema), defaultValues: { role: "teacher", permissions: [] } });
+  const form = useForm<MemberAccessValues>({
+    resolver: zodResolver(memberAccessSchema),
+    defaultValues: { role: "teacher", permissions: [] },
+  });
   const role = form.watch("role");
   const permissions = form.watch("permissions");
   const [confirmStatus, setConfirmStatus] = useState(false);
@@ -47,10 +48,12 @@ const useMemberAccessController = () => {
     const wanted = new Set(keys);
     return (catalog.data?.permissions ?? []).map((p) => p.key).filter((key) => wanted.has(key));
   };
-  const defaultsFor = (r: MemberAccessValues["role"]) => catalog.data?.roles.find((entry) => entry.role === r)?.defaults ?? [];
+  const defaultsFor = (r: MemberAccessValues["role"]) =>
+    catalog.data?.roles.find((entry) => entry.role === r)?.defaults ?? [];
 
   useEffect(() => {
-    if (member.data && catalog.data) form.reset({ role: member.data.role, permissions: ordered(member.data.permissions) });
+    if (member.data && catalog.data)
+      form.reset({ role: member.data.role, permissions: ordered(member.data.permissions) });
   }, [member.data, catalog.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isStaffRole = STAFF.includes(role);
@@ -67,11 +70,16 @@ const useMemberAccessController = () => {
   };
 
   const toggle = (key: PermissionKey, on: boolean) =>
-    form.setValue("permissions", ordered(on ? [...permissions, key] : permissions.filter((k) => k !== key)), { shouldDirty: true });
+    form.setValue("permissions", ordered(on ? [...permissions, key] : permissions.filter((k) => k !== key)), {
+      shouldDirty: true,
+    });
 
   const save = form.handleSubmit((values) =>
     update.mutate(
-      { role: values.role === "student" ? undefined : values.role, permissions: STAFF.includes(values.role) ? values.permissions : undefined },
+      {
+        role: values.role === "student" ? undefined : values.role,
+        permissions: STAFF.includes(values.role) ? values.permissions : undefined,
+      },
       { onSuccess: () => toast.success("Access saved.") }
     )
   );
@@ -96,7 +104,9 @@ const useMemberAccessController = () => {
     roleChoices: ROLE_OPTIONS.filter((option) => actorIsAdmin || option.value !== "admin"),
     changeRole,
     isStaffRole,
-    grantable: (catalog.data?.permissions ?? []).filter((p) => isStaffRole && p.grantableTo.includes(role as StaffRole)),
+    grantable: (catalog.data?.permissions ?? []).filter(
+      (p) => isStaffRole && p.grantableTo.includes(role as StaffRole)
+    ),
     selected: new Set(permissions),
     defaults: new Set(defaultsFor(role)),
     toggle,

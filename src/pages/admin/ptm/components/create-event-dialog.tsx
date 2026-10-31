@@ -1,7 +1,7 @@
-import FormDialog from "@/components/form-dialog";
-import { ChipsField, DateField, SelectField, TextField } from "@/components/form-fields";
-import { SelectOption } from "@/types";
-import { localDateString } from "@/utils";
+import FormDialog from "@/shared/ui/form-dialog";
+import { ChipsField, DateField, SelectField, TextField } from "@/shared/ui/form-fields";
+import { SelectOption } from "@/shared/types";
+import { localDateString } from "@/shared/lib";
 import useCreateEventDialogController from "./create-event-dialog-controller";
 
 const modeOptions: SelectOption[] = [
@@ -17,8 +17,19 @@ interface CreateEventDialogProps {
   onClose: () => void;
 }
 
-const CreateEventDialog = ({ organizationId, academicYearId, sectionOptions, open, onClose }: CreateEventDialogProps) => {
-  const { form, mode, onSubmit, isSubmitting } = useCreateEventDialogController({ organizationId, academicYearId, open, onClose });
+const CreateEventDialog = ({
+  organizationId,
+  academicYearId,
+  sectionOptions,
+  open,
+  onClose,
+}: CreateEventDialogProps) => {
+  const { form, mode, onSubmit, isSubmitting } = useCreateEventDialogController({
+    organizationId,
+    academicYearId,
+    open,
+    onClose,
+  });
 
   return (
     <FormDialog
@@ -49,7 +60,13 @@ const CreateEventDialog = ({ organizationId, academicYearId, sectionOptions, ope
           />
         )}
       </div>
-      <ChipsField form={form} name="sectionIds" label="Sections" options={sectionOptions} emptyText="No sections found." />
+      <ChipsField
+        form={form}
+        name="sectionIds"
+        label="Sections"
+        options={sectionOptions}
+        emptyText="No sections found."
+      />
     </FormDialog>
   );
 };

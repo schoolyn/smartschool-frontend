@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 
-import { useGetEmailNotificationLog, useUpdateEmailNotificationSettings } from "./service/notifications-service";
+import { useGetEmailNotificationLog, useUpdateEmailNotificationSettings } from "@/entities/notification";
 
 const useNotificationsController = () => {
   const { t } = useTranslation();
@@ -19,7 +19,10 @@ const useNotificationsController = () => {
     updateSettings.mutate(
       { emailNotificationsEnabled: checked },
       {
-        onSuccess: () => toast.success(checked ? "Email notifications enabled for this school." : "Email notifications turned off for this school."),
+        onSuccess: () =>
+          toast.success(
+            checked ? "Email notifications enabled for this school." : "Email notifications turned off for this school."
+          ),
         onError: () => toast.error("Could not update the setting. Please try again."),
       }
     );
@@ -29,7 +32,8 @@ const useNotificationsController = () => {
     updateSettings.mutate(
       { feeRemindersEnabled: checked },
       {
-        onSuccess: () => toast.success(checked ? "Parents will get fee due reminders." : "Fee due reminders turned off."),
+        onSuccess: () =>
+          toast.success(checked ? "Parents will get fee due reminders." : "Fee due reminders turned off."),
         onError: () => toast.error("Could not update the setting. Please try again."),
       }
     );

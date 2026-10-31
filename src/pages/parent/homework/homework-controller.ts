@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { useGetMyChildren } from "../ptm/service/my-children-service";
-import { useGetHomeworkForStudent } from "./service/homework-service";
+import { useGetMyChildren } from "@/entities/student";
+import { useGetHomeworkForStudent } from "@/entities/homework";
 
 export const useHomeworkController = () => {
   const { t } = useTranslation();
@@ -18,8 +18,7 @@ export const useHomeworkController = () => {
     if (!studentId && children.data?.items?.length) {
       setStudentId(children.data.items[0].studentId.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [children.data]);
+  }, [studentId, children.data]);
 
   return {
     t,

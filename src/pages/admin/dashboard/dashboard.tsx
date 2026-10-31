@@ -1,13 +1,15 @@
-import ErrorState from "@/components/error-state";
+import ErrorState from "@/shared/ui/error-state";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+// screen readers can describe the charts
+import "highcharts/modules/accessibility";
 import { Link } from "react-router-dom";
 import { BellIcon } from "@heroicons/react/24/outline";
 
-import NoticeModal from "@/components/notice-modal";
-import SectionHeader from "@/components/section-header";
+import { NoticeModalWrapper as NoticeModal } from "@/features/notice-modal";
+import SectionHeader from "@/shared/ui/section-header";
 import { useDashboardController } from "./dashboard-controller";
-import UserTypeSelectionModal from "@/components/user-type-selection-modal";
+import { UserTypeSelectionModal } from "@/features/user-type-selection-modal";
 import StatCard from "./stat-card";
 import ChartEmptyState from "./chart-empty-state";
 import { ChartSkeleton, StatCardSkeleton, UpdatesSkeleton } from "./dashboard-skeletons";
@@ -56,7 +58,6 @@ const Dashboard = () => {
     <div className="max-w-7xl mx-auto space-y-8 min-h-screen">
       <SectionHeader title={greetingTitle} description={`${todayLabel}. An overview of your school's activity.`} />
 
-      {/* Stats Grid */}
       {statsError && <ErrorState title="The numbers could not be loaded" error={statsError} onRetry={retryStats} />}
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ${statsError ? "hidden" : ""}`}>
         {isStatsLoading
@@ -74,7 +75,6 @@ const Dashboard = () => {
             ))}
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-white rounded-xl shadow-xl p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">{t("labels.quick_actions")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -94,7 +94,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Row 1: Monthly Attendance (70%) + Recent Updates (30%) */}
       <div className="grid grid-cols-1 md:grid-cols-10 gap-8">
         {showAttendanceChart && (
           <div className={showNotices ? "md:col-span-7" : "md:col-span-10"}>{chartCard(monthlyAttendanceOptions)}</div>
@@ -149,7 +148,6 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Row 2: Teacher-Student Ratio (30%) + Exam Performance Trend (70%) */}
       <div className="grid grid-cols-1 md:grid-cols-10 gap-8">
         <div className="md:col-span-3 bg-white rounded-xl shadow-xl p-6">
           {isChartsLoading ? (

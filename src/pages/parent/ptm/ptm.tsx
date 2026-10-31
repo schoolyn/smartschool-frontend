@@ -1,12 +1,12 @@
-import CustomSelectDropdown from "@/components/custom-select";
-import DataTable from "@/components/data-table";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import EmptyState from "@/components/empty-state";
-import ErrorState from "@/components/error-state";
-import FormDialog from "@/components/form-dialog";
-import { SelectField } from "@/components/form-fields";
-import SectionHeader from "@/components/section-header";
-import Spinner from "@/components/spinner";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import DataTable from "@/shared/ui/data-table";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import EmptyState from "@/shared/ui/empty-state";
+import ErrorState from "@/shared/ui/error-state";
+import FormDialog from "@/shared/ui/form-dialog";
+import { SelectField } from "@/shared/ui/form-fields";
+import SectionHeader from "@/shared/ui/section-header";
+import Spinner from "@/shared/ui/spinner";
 import { bookingColumns } from "./ptm-columns";
 import useParentPTMController from "./ptm-controller";
 
@@ -67,7 +67,11 @@ const ParentPTM = () => {
         {isLoadingEvents ? (
           <Spinner />
         ) : events.length === 0 ? (
-          <EmptyState compact title="No meetings open for booking" description="When the school opens parent-teacher meeting slots, you can book one here." />
+          <EmptyState
+            compact
+            title="No meetings open for booking"
+            description="When the school opens parent-teacher meeting slots, you can book one here."
+          />
         ) : (
           <>
             <CustomSelectDropdown
@@ -82,23 +86,28 @@ const ParentPTM = () => {
                 {isLoadingSlots ? (
                   <Spinner />
                 ) : slotItems.length === 0 ? (
-                  <EmptyState compact title="No open slots yet" description="Teachers haven't opened time for your child's section." />
+                  <EmptyState
+                    compact
+                    title="No open slots yet"
+                    description="Teachers haven't opened time for your child's section."
+                  />
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {slotItems.map((slot) => (
                       <button
                         type="button"
                         key={slot.id}
-                        disabled={slot.full}
+                        disabled={slot.full || slot.alreadyBooked}
                         onClick={() => openBookingFor(slot.id)}
                         className={`px-3 py-2 rounded-md text-xs border text-left ${
-                          slot.full
+                          slot.full || slot.alreadyBooked
                             ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
                             : "bg-white text-gray-700 border-gray-300 hover:bg-primary-50"
                         }`}
                       >
                         <div className="font-medium">{slot.teacherName}</div>
                         <div>{slot.time}</div>
+                        {slot.alreadyBooked && <div>Already booked</div>}
                       </button>
                     ))}
                   </div>

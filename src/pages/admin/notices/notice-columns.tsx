@@ -1,8 +1,8 @@
 import { DocumentArrowDownIcon, EyeIcon } from "@heroicons/react/24/outline";
 
-import { DataTableColumn } from "@/components/data-table";
-import RowMenu from "@/components/row-menu";
-import { INotice } from "@/types";
+import { DataTableColumn } from "@/shared/ui/data-table";
+import RowMenu from "@/shared/ui/row-menu";
+import { INotice } from "@/entities/notice";
 
 interface NoticeColumnActions {
   viewAttachment: (attachmentURL: string, fileName: string) => void;

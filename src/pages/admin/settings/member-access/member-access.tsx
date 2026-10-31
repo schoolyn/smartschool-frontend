@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import ErrorState from "@/components/error-state";
-import PageLoader from "@/components/page-loader";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AccountRole } from "@/types";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import ErrorState from "@/shared/ui/error-state";
+import PageLoader from "@/shared/ui/page-loader";
+import { Badge } from "@/shared/ui/kit/badge";
+import { Button } from "@/shared/ui/kit/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/kit/select";
+import { AccountRole } from "@/shared/types";
 import { PermissionList } from "../access";
 import useMemberAccessController from "./member-access-controller";
 
@@ -49,7 +49,9 @@ const MemberAccess = () => {
         )}
       </div>
 
-      {locked && <p className="rounded-md border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">{c.lockedReason}</p>}
+      {locked && (
+        <p className="rounded-md border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">{c.lockedReason}</p>
+      )}
 
       <div className="rounded-lg bg-white p-6 shadow">
         <p className="text-sm font-medium text-gray-900">Role in this school</p>
@@ -89,7 +91,13 @@ const MemberAccess = () => {
           )}
         </div>
         {c.isStaffRole && (
-          <PermissionList permissions={c.grantable} value={c.selected} defaults={c.defaults} disabled={locked} onToggle={c.toggle} />
+          <PermissionList
+            permissions={c.grantable}
+            value={c.selected}
+            defaults={c.defaults}
+            disabled={locked}
+            onToggle={c.toggle}
+          />
         )}
       </div>
 

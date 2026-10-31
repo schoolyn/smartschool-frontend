@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { RowMenuItem } from "@/components/row-menu";
-import { useMutationFeedback } from "@/hooks";
-import { IClass } from "@/types";
-import { useCreateClass, useDeactivateClass, useGetClasses, useUpdateClass } from "../service/academics-service";
+import { RowMenuItem } from "@/shared/ui/row-menu";
+import { useMutationFeedback } from "@/shared/lib/hooks";
+import { IClass } from "@/entities/academics";
+import { useCreateClass, useDeactivateClass, useGetClasses, useUpdateClass } from "@/entities/academics";
 import { classFormSchema, ClassFormValues, defaultClassFormValues } from "../classes.schema";
 
 const useClassesTabController = (organizationId: string, yearId: string, onViewSections: (classId: string) => void) => {
@@ -28,7 +28,7 @@ const useClassesTabController = (organizationId: string, yearId: string, onViewS
     form.reset(
       dialog.klass
         ? { name: dialog.klass.name, numericLevel: dialog.klass.numericLevel?.toString() ?? "" }
-        : defaultClassFormValues,
+        : defaultClassFormValues
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialog]);

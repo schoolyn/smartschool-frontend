@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { ICertificateDraft, SelectOption } from "@/types";
+import { ICertificateDraft } from "@/entities/certificate";
+import { SelectOption } from "@/shared/types";
 
 const required = (label: string, max = 120) => z.string().trim().min(1, `${label} is required.`).max(max);
 const gender = z.enum(["male", "female", "other"], { message: "Choose one." });

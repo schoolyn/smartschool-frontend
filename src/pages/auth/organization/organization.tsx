@@ -1,4 +1,4 @@
-import ErrorState from "@/components/error-state";
+import ErrorState from "@/shared/ui/error-state";
 import {
   ArrowRightOnRectangleIcon,
   MagnifyingGlassIcon,
@@ -8,9 +8,9 @@ import {
   PencilIcon,
 } from "@heroicons/react/24/outline";
 
-import Avatar from "@/components/avatar";
-import LogoSpinner from "@/components/logo-spinner";
-import { IOrganization } from "@/types";
+import Avatar from "@/shared/ui/avatar";
+import LogoSpinner from "@/shared/ui/logo-spinner";
+import { IOrganization } from "@/entities/organization";
 import useOrganizationController from "./organization-controller";
 import EditOrganizationModal from "./edit-organization-modal";
 
@@ -48,14 +48,10 @@ function Organization() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
               <div>
-                <h1 className="text-2xl font-semibold text-base-400">
-                  Organizations
-                </h1>
+                <h1 className="text-2xl font-semibold text-base-400">Organizations</h1>
                 <p className="text-sm text-base-600 mt-1">
                   Select an organization to view and manage its information
-                  {hasAnyOrganization && (
-                    <span className="text-gray-400"> · {organization.length} total</span>
-                  )}
+                  {hasAnyOrganization && <span className="text-gray-400"> · {organization.length} total</span>}
                 </p>
               </div>
               <div className="flex gap-3">
@@ -88,18 +84,14 @@ function Organization() {
             {!hasAnyOrganization ? (
               <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200">
                 <BuildingOffice2Icon className="h-12 w-12 text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-1">
-                  No organizations yet
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No organizations yet</h3>
                 <p className="text-sm text-gray-500 mb-6 text-center max-w-md">
                   Your account isn't linked to any school yet. Contact your platform admin to get set up.
                 </p>
               </div>
             ) : organization.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900 mb-1">
-                  No organizations found
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No organizations found</h3>
                 <p className="text-sm text-gray-500 mb-6 text-center max-w-md">
                   No organizations match "{searchTerm}". Try a different search term.
                 </p>
@@ -123,9 +115,7 @@ function Organization() {
                         <div className="flex items-center min-w-0">
                           <Avatar name={workspace.name} src={workspace.logo?.url} size={48} />
                           <div className="ml-4 min-w-0">
-                            <h3 className="text-lg font-semibold text-base-400 truncate">
-                              {workspace.name}
-                            </h3>
+                            <h3 className="text-lg font-semibold text-base-400 truncate">{workspace.name}</h3>
                             {workspace.address && (
                               <p className="flex items-center gap-1 text-xs text-base-600 mt-0.5 truncate">
                                 <MapPinIcon className="h-3.5 w-3.5 shrink-0" />
@@ -160,20 +150,14 @@ function Organization() {
 
                     <div className="px-6 py-5 space-y-3">
                       <div>
-                        <p className="text-xs text-base-600 uppercase font-medium tracking-wide">
-                          Description
-                        </p>
+                        <p className="text-xs text-base-600 uppercase font-medium tracking-wide">Description</p>
                         <p className="text-sm text-base-400 mt-1">
                           {workspace.description || "No description provided"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-base-600 uppercase font-medium tracking-wide">
-                          Code
-                        </p>
-                        <p className="text-sm text-base-400 font-mono mt-1">
-                          {workspace.pincode}
-                        </p>
+                        <p className="text-xs text-base-600 uppercase font-medium tracking-wide">Code</p>
+                        <p className="text-sm text-base-400 font-mono mt-1">{workspace.pincode}</p>
                       </div>
                     </div>
 

@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useAreaBase } from "@/context/tenant-context";
-import { useError } from "@/hooks";
-import { openSupportAttachment, useReplyToSupportRequest, useSupportThread } from "../service";
-import { defaultSupportReply, SupportReplyValues, supportReplySchema } from "../support.schema";
+import { useAreaBase } from "@/entities/session";
+import { useError } from "@/shared/lib/hooks";
+import { openSupportAttachment, useReplyToSupportRequest, useSupportThread } from "@/entities/support";
+import { defaultSupportReply, SupportReplyValues, supportReplySchema } from "@/entities/support";
 
 const useSupportThreadController = () => {
   const { organizationId = "", requestId = "" } = useParams();
@@ -15,7 +15,10 @@ const useSupportThreadController = () => {
   const reply = useReplyToSupportRequest(organizationId, requestId);
   useError({ mutation: reply });
 
-  const form = useForm<SupportReplyValues>({ resolver: zodResolver(supportReplySchema), defaultValues: defaultSupportReply });
+  const form = useForm<SupportReplyValues>({
+    resolver: zodResolver(supportReplySchema),
+    defaultValues: defaultSupportReply,
+  });
   const send = form.handleSubmit((values) =>
     reply.mutate(values, {
       onSuccess: () => {
@@ -26,7 +29,9 @@ const useSupportThreadController = () => {
   );
 
   const openAttachment = (messageId: string) =>
-    openSupportAttachment(organizationId, requestId, messageId).catch(() => toast.error("The screenshot couldn't be opened."));
+    openSupportAttachment(organizationId, requestId, messageId).catch(() =>
+      toast.error("The screenshot couldn't be opened.")
+    );
 
   return {
     backTo: `${areaBase}/support`,

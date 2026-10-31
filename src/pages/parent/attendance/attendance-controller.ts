@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetStudentAttendanceHistory } from "@/pages/admin/students/service/attendance-history-service";
-import { useGetMyChildren } from "../ptm/service/my-children-service";
+import { useGetStudentAttendanceHistory } from "@/entities/student";
+import { useGetMyChildren } from "@/entities/student";
 
 const thisMonth = () => new Date().toISOString().slice(0, 7);
 

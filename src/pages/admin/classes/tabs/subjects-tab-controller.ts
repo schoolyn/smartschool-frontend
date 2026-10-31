@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { RowMenuItem } from "@/components/row-menu";
-import { useMutationFeedback } from "@/hooks";
-import { ISubject } from "@/types";
-import { useCreateSubject, useDeactivateSubject, useGetSubjects, useUpdateSubject } from "../service/academics-service";
+import { RowMenuItem } from "@/shared/ui/row-menu";
+import { useMutationFeedback } from "@/shared/lib/hooks";
+import { ISubject } from "@/entities/academics";
+import { useCreateSubject, useDeactivateSubject, useGetSubjects, useUpdateSubject } from "@/entities/academics";
 import { defaultSubjectFormValues, subjectFormSchema, SubjectFormValues } from "../classes.schema";
 
 const useSubjectsTabController = (organizationId: string, yearId: string) => {
@@ -29,7 +29,7 @@ const useSubjectsTabController = (organizationId: string, yearId: string) => {
     form.reset(
       subject
         ? { name: subject.name, code: subject.code, type: (subject.type as SubjectFormValues["type"]) ?? "core" }
-        : defaultSubjectFormValues,
+        : defaultSubjectFormValues
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialog]);

@@ -1,6 +1,6 @@
-import DataTable from "@/components/data-table";
-import ErrorState from "@/components/error-state";
-import { Checkbox } from "@/components/ui/checkbox";
+import DataTable from "@/shared/ui/data-table";
+import ErrorState from "@/shared/ui/error-state";
+import { Checkbox } from "@/shared/ui/kit/checkbox";
 import { registerColumns } from "./monthly-register-columns";
 import useMonthlyRegisterController from "./monthly-register-controller";
 

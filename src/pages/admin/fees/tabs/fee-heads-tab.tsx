@@ -1,12 +1,12 @@
-import DataTable from "@/components/data-table";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import ErrorState from "@/components/error-state";
-import FormDialog from "@/components/form-dialog";
-import { CheckboxField, SelectField, TextField } from "@/components/form-fields";
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import { SelectOption } from "@/types";
+import DataTable from "@/shared/ui/data-table";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import ErrorState from "@/shared/ui/error-state";
+import FormDialog from "@/shared/ui/form-dialog";
+import { CheckboxField, SelectField, TextField } from "@/shared/ui/form-fields";
+import { Button } from "@/shared/ui/kit/button";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
+import { Form } from "@/shared/ui/kit/form";
+import { SelectOption } from "@/shared/types";
 import { feeHeadColumns } from "./fee-heads-columns";
 import useFeeHeadsController from "./fee-heads-controller";
 
@@ -53,7 +53,10 @@ const FeeHeadsTab = ({ organizationId }: { organizationId: string }) => {
             isLoading={c.isLoading}
             itemLabel={{ one: "fee head", other: "fee heads" }}
             pagination={{ pageSize: 20 }}
-            empty={{ title: "No fee heads yet", description: "Add one above, such as Tuition or Transport, to build fee structures from." }}
+            empty={{
+              title: "No fee heads yet",
+              description: "Add one above, such as Tuition or Transport, to build fee structures from.",
+            }}
           />
         )}
       </div>

@@ -1,14 +1,14 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 
-import DataTable from "@/components/data-table";
-import ErrorState from "@/components/error-state";
-import { ChipsField, DateField, SelectField, TextField } from "@/components/form-fields";
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Form } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
-import { formatMoney } from "@/utils";
+import DataTable from "@/shared/ui/data-table";
+import ErrorState from "@/shared/ui/error-state";
+import { ChipsField, DateField, SelectField, TextField } from "@/shared/ui/form-fields";
+import { Button } from "@/shared/ui/kit/button";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
+import { Checkbox } from "@/shared/ui/kit/checkbox";
+import { Form } from "@/shared/ui/kit/form";
+import { Label } from "@/shared/ui/kit/label";
+import { formatMoney } from "@/shared/lib";
 import { feeStructureColumns } from "./fee-structures-columns";
 import useFeeStructuresController from "./fee-structures-controller";
 
@@ -23,7 +23,8 @@ const FeeStructuresTab = ({ organizationId }: { organizationId: string }) => {
         <CardTitle className="mb-4 font-medium">{editing ? `Edit ${editing.name}` : "Create Fee Structure"}</CardTitle>
         {editing && (
           <p className="mb-4 text-sm text-gray-500">
-            Students already billed keep their amounts unless you move the ones who haven&apos;t paid yet. Past payments never change.
+            Students already billed keep their amounts unless you move the ones who haven&apos;t paid yet. Past payments
+            never change.
           </p>
         )}
         <Form {...form}>
@@ -42,7 +43,9 @@ const FeeStructuresTab = ({ organizationId }: { organizationId: string }) => {
               name="sectionIds"
               label="Sections (optional, narrows the classes above)"
               options={c.sectionOptions}
-              emptyText={classIds.length ? "These classes have no sections yet." : "Pick a class above to see its sections."}
+              emptyText={
+                classIds.length ? "These classes have no sections yet." : "Pick a class above to see its sections."
+              }
             />
 
             <div>
@@ -53,13 +56,27 @@ const FeeStructuresTab = ({ organizationId }: { organizationId: string }) => {
                 </Button>
               </div>
               {c.feeHeadOptions.length === 0 && !c.isLoadingFeeHeads && (
-                <p className="mb-2 text-sm text-gray-500">Create a fee head first (Fee Heads tab), then pick it here.</p>
+                <p className="mb-2 text-sm text-gray-500">
+                  Create a fee head first (Fee Heads tab), then pick it here.
+                </p>
               )}
               <div className="space-y-2">
                 {items.fields.map((row, index) => (
                   <div key={row.id} className="grid grid-cols-[1fr_1fr_auto] items-start gap-2">
-                    <SelectField form={form} name={`items.${index}.feeHeadId`} label="Fee head" options={c.feeHeadOptions} />
-                    <TextField form={form} name={`items.${index}.amount`} label="Amount (₹)" type="number" min={0} step="0.01" />
+                    <SelectField
+                      form={form}
+                      name={`items.${index}.feeHeadId`}
+                      label="Fee head"
+                      options={c.feeHeadOptions}
+                    />
+                    <TextField
+                      form={form}
+                      name={`items.${index}.amount`}
+                      label="Amount (₹)"
+                      type="number"
+                      min={0}
+                      step="0.01"
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
@@ -82,7 +99,11 @@ const FeeStructuresTab = ({ organizationId }: { organizationId: string }) => {
                 <Button
                   variant="link"
                   onClick={() =>
-                    installments.append({ label: `Installment ${installments.fields.length + 1}`, dueDate: "", amount: "" })
+                    installments.append({
+                      label: `Installment ${installments.fields.length + 1}`,
+                      dueDate: "",
+                      amount: "",
+                    })
                   }
                 >
                   + Add installment
@@ -124,8 +145,23 @@ const FeeStructuresTab = ({ organizationId }: { organizationId: string }) => {
             <div>
               <Label>Late fee (optional)</Label>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <TextField form={form} name="lateFeeAmount" label="Fine per installment (₹)" type="number" min={0} step="0.01" placeholder="None" />
-                <TextField form={form} name="lateFeeGraceDays" label="Days after the due date" type="number" min={0} step="1" />
+                <TextField
+                  form={form}
+                  name="lateFeeAmount"
+                  label="Fine per installment (₹)"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="None"
+                />
+                <TextField
+                  form={form}
+                  name="lateFeeGraceDays"
+                  label="Days after the due date"
+                  type="number"
+                  min={0}
+                  step="1"
+                />
               </div>
               <p className="mt-1 text-xs text-gray-500">
                 Added once to an installment still unpaid this many days after its due date. Waive it with a concession.
@@ -134,7 +170,11 @@ const FeeStructuresTab = ({ organizationId }: { organizationId: string }) => {
 
             {editing && (
               <label className="flex items-start gap-2 text-sm text-gray-700">
-                <Checkbox checked={c.applyToUnpaid} onChange={(event) => c.setApplyToUnpaid(event.target.checked)} className="mt-0.5" />
+                <Checkbox
+                  checked={c.applyToUnpaid}
+                  onChange={(event) => c.setApplyToUnpaid(event.target.checked)}
+                  className="mt-0.5"
+                />
                 <span>Also move students who haven&apos;t paid anything yet to these new amounts</span>
               </label>
             )}
@@ -164,7 +204,10 @@ const FeeStructuresTab = ({ organizationId }: { organizationId: string }) => {
             isLoading={c.isLoadingStructures}
             itemLabel={{ one: "structure", other: "structures" }}
             pagination={{ pageSize: 20 }}
-            empty={{ title: "No fee structures yet", description: "Create one above, then assign it to a class to bill its students." }}
+            empty={{
+              title: "No fee structures yet",
+              description: "Create one above, then assign it to a class to bill its students.",
+            }}
           />
         )}
       </div>

@@ -1,4 +1,4 @@
 # only the files being committed: lint (unused variables and imports fail it), fix, format, then re-add
-npx lint-staged
+pnpm exec lint-staged
 # the whole app still has to typecheck
-npx tsc --noEmit -p tsconfig.app.json
+pnpm exec tsc --noEmit -p tsconfig.app.json

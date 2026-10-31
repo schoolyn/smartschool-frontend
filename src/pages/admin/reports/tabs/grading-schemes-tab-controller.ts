@@ -1,52 +1,47 @@
-import { useFieldArray, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { PlusIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 
-import { useError } from "@/hooks";
-import { defaultGradingSchemeValues, gradingSchemeSchema, GradingSchemeFormValues } from "../reports.schema";
-import { useCreateGradingScheme, useGetGradingSchemes } from "../service/exams-service";
+import { useHeaderActions } from "@/shared/ui/section-header";
+import { useError } from "@/shared/lib/hooks";
+import { IGradingScheme } from "@/entities/exam";
+import { useDeleteGradingScheme, useGetGradingSchemes } from "@/entities/exam";
 
 const useGradingSchemesTabController = (organizationId: string) => {
   const schemes = useGetGradingSchemes(organizationId);
-  const createScheme = useCreateGradingScheme(organizationId);
-  useError({ mutation: createScheme });
+  const deleteScheme = useDeleteGradingScheme(organizationId);
+  useError({ mutation: deleteScheme });
 
-  const form = useForm<GradingSchemeFormValues>({
-    resolver: zodResolver(gradingSchemeSchema),
-    defaultValues: defaultGradingSchemeValues(),
-  });
-  const bands = useFieldArray({ control: form.control, name: "bands" });
+  // undefined = closed, null = creating, a scheme = editing it
+  const [editing, setEditing] = useState<IGradingScheme | null | undefined>(undefined);
+  const [toDelete, setToDelete] = useState<IGradingScheme | null>(null);
 
-  const onSubmit = form.handleSubmit((values) =>
-    createScheme.mutate(
-      {
-        name: values.name,
-        passPercent: Number(values.passPercent),
-        bands: values.bands.map((band) => ({
-          grade: band.grade,
-          minPercent: Number(band.minPercent),
-          maxPercent: Number(band.maxPercent),
-          gradePoint: Number(band.gradePoint),
-        })),
+  useHeaderActions({ action: { label: "Create scheme", icon: PlusIcon, onClick: () => setEditing(null) } });
+
+  const confirmDelete = () =>
+    toDelete &&
+    deleteScheme.mutate(toDelete.id, {
+      onSuccess: () => {
+        toast.success("Grading scheme removed.");
+        setToDelete(null);
       },
-      {
-        onSuccess: () => {
-          toast.success("Grading scheme created.");
-          form.reset(defaultGradingSchemeValues());
-        },
-      }
-    )
-  );
+      onError: () => setToDelete(null),
+    });
 
   return {
-    form,
-    bands,
-    onSubmit,
-    isCreating: createScheme.isPending,
     schemes: schemes.data?.items ?? [],
     isLoading: schemes.isLoading,
     error: schemes.isError ? schemes.error : null,
     retry: () => schemes.refetch(),
+    editing,
+    openCreate: () => setEditing(null),
+    openEdit: (scheme: IGradingScheme) => setEditing(scheme),
+    closeForm: () => setEditing(undefined),
+    toDelete,
+    askDelete: setToDelete,
+    cancelDelete: () => setToDelete(null),
+    confirmDelete,
+    isDeleting: deleteScheme.isPending,
   };
 };
 

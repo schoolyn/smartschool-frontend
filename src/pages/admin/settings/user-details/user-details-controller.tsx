@@ -7,17 +7,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { UsersIcon } from "@heroicons/react/20/solid";
 
-import { IAllUserDetails, IRoleOptionDropDown } from "@/types";
+import { IAllUserDetails, IRoleOptionDropDown } from "@/entities/user";
 import { ROLE_OPTIONS } from "../access";
-import { useAddUserDetail, useDeleteUser, useGetAllUserDetails, useUpdateUserDetail } from "./service";
-import { useError, usePaging } from "@/hooks";
-import { useAuth } from "@/context/auth-context";
-import { useAreaBase } from "@/context/tenant-context";
+import { useAddUserDetail, useDeleteUser, useGetAllUserDetails, useUpdateUserDetail } from "@/entities/user";
+import { useError, usePaging } from "@/shared/lib/hooks";
+import { useAuth } from "@/entities/session";
+import { useAreaBase } from "@/entities/session";
 import { userFormSchema, defaultUserFormValues, UserFormValues } from "./user-details.schema";
 
 const FILTER_OPTIONS: IRoleOptionDropDown[] = [
-  { value: "all", label: "All Users", description: "Everyone in the school", icon: <UsersIcon className="h-5 w-5 text-gray-400" /> },
-  ...ROLE_OPTIONS.map((option) => ({ value: option.value, label: `${option.label}s`, description: `${option.label}s only`, icon: option.icon })),
+  {
+    value: "all",
+    label: "All Users",
+    description: "Everyone in the school",
+    icon: <UsersIcon className="h-5 w-5 text-gray-400" />,
+  },
+  ...ROLE_OPTIONS.map((option) => ({
+    value: option.value,
+    label: `${option.label}s`,
+    description: `${option.label}s only`,
+    icon: option.icon,
+  })),
 ];
 
 const useUserDetailsController = () => {
@@ -38,7 +48,13 @@ const useUserDetailsController = () => {
   const form = useForm<UserFormValues>({ resolver: zodResolver(userFormSchema), defaultValues: defaultUserFormValues });
 
   const addUserDetail = useAddUserDetail(organizationId);
-  const getAllUserDetails = useGetAllUserDetails(organizationId, searchTerm, sortBy === "all" ? "" : sortBy, page, pageSize);
+  const getAllUserDetails = useGetAllUserDetails(
+    organizationId,
+    searchTerm,
+    sortBy === "all" ? "" : sortBy,
+    page,
+    pageSize
+  );
   const users: IAllUserDetails[] = getAllUserDetails.data?.rows ?? [];
   const deleteUser = useDeleteUser(organizationId);
   const updateUserDetails = useUpdateUserDetail(organizationId);

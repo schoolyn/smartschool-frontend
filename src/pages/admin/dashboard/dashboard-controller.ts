@@ -16,14 +16,15 @@ import {
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
 
-import { ICreateNoticeRequest, ModuleKey } from "@/types";
-import { useGetNoticeList, useCreateNotice } from "../notices/service";
-import { useError } from "@/hooks";
-import { useTheme } from "@/context/theme-context";
-import { useAuth } from "@/context/auth-context";
-import useGetDashboardStats from "./service/get-dashboard-stats";
-import useGetDashboardCharts from "./service/get-dashboard-charts";
-import { useAreaBase, useHasModule } from "@/context/tenant-context";
+import { ICreateNoticeRequest } from "@/entities/notice";
+import { ModuleKey } from "@/shared/types";
+import { useGetNoticeList, useCreateNotice } from "@/entities/notice";
+import { useError } from "@/shared/lib/hooks";
+import { useTheme } from "@/features/theme";
+import { useAuth } from "@/entities/session";
+import { useGetDashboardStats } from "@/entities/dashboard";
+import { useGetDashboardCharts } from "@/entities/dashboard";
+import { useAreaBase, useHasModule } from "@/entities/session";
 
 export const useDashboardController = () => {
   const navigate = useNavigate();
@@ -31,8 +32,7 @@ export const useDashboardController = () => {
   const { theme } = useTheme();
   const { user } = useAuth();
 
-  // Highcharts renders its own inline SVG styling; Tailwind's dark-mode CSS can't
-  // reach it, so the chart options themselves have to switch colors on theme change
+  // Tailwind dark mode can't reach Highcharts' inline SVG, so the options switch colors per theme
   const isDark = theme === "dark";
   const chartAxisLabelColor = isDark ? "#9CA3AF" : "#6B7280";
   const chartLegendColor = isDark ? "#D1D5DB" : "#4B5563";
@@ -105,8 +105,6 @@ export const useDashboardController = () => {
         color: examTrendColor,
         lineWidth: 3,
         marker: { enabled: true, radius: 5, lineWidth: 2, lineColor: isDark ? "#262626" : "#ffffff" },
-        // a gradient fill under the curve, rather than a flat single color: real Highcharts
-        // config, not a static image effect.
         fillColor: {
           linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
           stops: [
@@ -119,8 +117,7 @@ export const useDashboardController = () => {
     legend: { itemStyle: { color: chartLegendColor } },
   };
 
-  // a pie of two zero-value slices has nothing to show percentages of; Highcharts still draws
-  // connector lines pointing at an empty circle, which reads as broken rather than empty
+  // a pie of zero-value slices still draws connectors to an empty circle, which reads as broken
   const hasTeacherStudentData = stats.totalTeachers > 0 || stats.totalStudents > 0;
 
   const teacherStudentRatioOptions = {

@@ -1,5 +1,5 @@
-import DataTable from "@/components/data-table";
-import { ITimetableSlot } from "@/types";
+import DataTable from "@/shared/ui/data-table";
+import { ITimetableSlot } from "@/entities/timetable";
 import { periodRows, weekDays } from "../timetable.utils";
 import { weekGridColumns } from "./week-grid-columns";
 

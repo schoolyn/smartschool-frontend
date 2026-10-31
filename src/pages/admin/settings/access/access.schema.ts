@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PermissionKey } from "@/types";
+import { PermissionKey } from "@/shared/types";
 
 const permissionList = z.array(z.custom<PermissionKey>((value) => typeof value === "string"));
 

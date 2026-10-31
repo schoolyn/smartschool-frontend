@@ -1,18 +1,17 @@
 import { useTranslation } from "react-i18next";
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import Spinner from "@/components/spinner";
-import EmptyState from "@/components/empty-state";
-import SectionHeader from "@/components/section-header";
-import CustomSelectDropdown from "@/components/custom-select";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import Spinner from "@/shared/ui/spinner";
+import EmptyState from "@/shared/ui/empty-state";
+import SectionHeader from "@/shared/ui/section-header";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import { DateField, FileField } from "@/shared/ui/form-fields";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/kit/form";
+import { Button } from "@/shared/ui/kit/button";
+import { Textarea } from "@/shared/ui/kit/textarea";
 import { useLeaveRequestsController } from "./leave-requests-controller";
-import { SelectOption } from "@/types";
+import { SelectOption } from "@/shared/types";
 
 const statusBadgeClass: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -24,6 +23,10 @@ const statusBadgeClass: Record<string, string> = {
 const LeaveRequests = () => {
   const { t } = useTranslation();
   const c = useLeaveRequestsController();
+  const childOptions = c.children.map((child): SelectOption => ({
+    id: child.studentId.id,
+    name: child.studentId.name,
+  }));
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -35,7 +38,10 @@ const LeaveRequests = () => {
           icon: PlusIcon,
           onClick: c.toggleForm,
           disabled: c.children.length === 0,
-          title: c.children.length === 0 ? "Leave can be requested once the school links your child to this account" : undefined,
+          title:
+            c.children.length === 0
+              ? "Leave can be requested once the school links your child to this account"
+              : undefined,
         }}
       />
 
@@ -52,14 +58,8 @@ const LeaveRequests = () => {
                     <FormControl>
                       <CustomSelectDropdown
                         placeholder="Select child"
-                        options={c.children.map((child): SelectOption => ({
-                          id: child.studentId.id,
-                          name: child.studentId.name,
-                        }))}
-                        value={(() => {
-                          const child = c.children.find((child) => child.studentId.id === field.value);
-                          return child ? { id: child.studentId.id, name: child.studentId.name } : null;
-                        })()}
+                        options={childOptions}
+                        value={childOptions.find((option) => option.id === field.value) ?? null}
                         onChange={(o) => field.onChange(String(o.id))}
                       />
                     </FormControl>
@@ -67,32 +67,8 @@ const LeaveRequests = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={c.form.control}
-                name="fromDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>From Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={c.form.control}
-                name="toDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>To Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <DateField form={c.form} name="fromDate" label="From Date" />
+              <DateField form={c.form} name="toDate" label="To Date" />
             </div>
 
             <FormField
@@ -109,10 +85,14 @@ const LeaveRequests = () => {
               )}
             />
 
-            <div>
-              <Label>{t("labels.attachment")}</Label>
-              <Input type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={c.handleFileChange} />
-            </div>
+            <FileField
+              form={c.form}
+              name="attachment"
+              label={t("labels.attachment")}
+              accept=".pdf,.png,.jpg,.jpeg"
+              maxBytes={10 * 1024 * 1024}
+              hint="PDF, PNG or JPG, up to 10 MB"
+            />
 
             <div className="flex justify-end gap-3">
               <Button variant="secondary" onClick={() => c.setShowForm(false)}>
@@ -135,7 +115,11 @@ const LeaveRequests = () => {
         ) : c.leaveRequests.length === 0 ? (
           <EmptyState
             title="No leave requests yet"
-            description={c.children.length ? "Use New Leave Request to ask for leave for your child." : "Leave can be requested once the school links your child to this account."}
+            description={
+              c.children.length
+                ? "Use New Leave Request to ask for leave for your child."
+                : "Leave can be requested once the school links your child to this account."
+            }
           />
         ) : (
           <div className="divide-y divide-gray-100">

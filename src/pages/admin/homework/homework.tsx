@@ -1,29 +1,40 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import Spinner from "@/components/spinner";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import EmptyState from "@/components/empty-state";
-import SectionHeader from "@/components/section-header";
-import CustomSelectDropdown from "@/components/custom-select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import Spinner from "@/shared/ui/spinner";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import EmptyState from "@/shared/ui/empty-state";
+import SectionHeader from "@/shared/ui/section-header";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import { DateField, FileField } from "@/shared/ui/form-fields";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/kit/form";
+import { Button } from "@/shared/ui/kit/button";
+import { Input } from "@/shared/ui/kit/input";
+import { Label } from "@/shared/ui/kit/label";
+import { Textarea } from "@/shared/ui/kit/textarea";
 import { useTranslation } from "react-i18next";
 import { useHomeworkController } from "./homework-controller";
-import { SelectOption } from "@/types";
+import { SelectOption } from "@/shared/types";
 
 const Homework = () => {
   const { t } = useTranslation();
   const c = useHomeworkController();
+  const yearOptions = c.academicYears.map((y): SelectOption => ({ id: y.id, name: y.name }));
+  const classOptions = c.classes.map((k): SelectOption => ({ id: k.id, name: k.name }));
+  const sectionOptions = c.sections.map((s): SelectOption => ({ id: s.id, name: s.name }));
+  const subjectOptions = c.subjects.map((s): SelectOption => ({ id: s.id, name: s.name }));
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <SectionHeader
         title="Homework"
         description="Assign and manage homework for a class section"
-        action={{ label: "Assign Homework", icon: PlusIcon, onClick: c.toggleForm, disabled: !c.sectionId, title: !c.sectionId ? "Pick a class and section first" : undefined }}
+        action={{
+          label: "Assign Homework",
+          icon: PlusIcon,
+          onClick: c.toggleForm,
+          disabled: !c.sectionId,
+          title: !c.sectionId ? "Pick a class and section first" : undefined,
+        }}
       />
 
       {c.hasNoClasses && (
@@ -38,11 +49,8 @@ const Homework = () => {
             <Label>Academic Year</Label>
             <CustomSelectDropdown
               placeholder="Select"
-              options={c.academicYears.map((y): SelectOption => ({ id: y.id, name: y.name }))}
-              value={(() => {
-                const y = c.academicYears.find((y) => y.id === c.academicYearId);
-                return y ? { id: y.id, name: y.name } : null;
-              })()}
+              options={yearOptions}
+              value={yearOptions.find((option) => option.id === c.academicYearId) ?? null}
               onChange={(o) => c.setAcademicYearId(String(o.id))}
             />
           </div>
@@ -51,11 +59,8 @@ const Homework = () => {
             <CustomSelectDropdown
               placeholder="Select"
               disabled={!c.academicYearId}
-              options={c.classes.map((k): SelectOption => ({ id: k.id, name: k.name }))}
-              value={(() => {
-                const k = c.classes.find((k) => k.id === c.classId);
-                return k ? { id: k.id, name: k.name } : null;
-              })()}
+              options={classOptions}
+              value={classOptions.find((option) => option.id === c.classId) ?? null}
               onChange={(o) => c.setClassId(String(o.id))}
             />
           </div>
@@ -64,11 +69,8 @@ const Homework = () => {
             <CustomSelectDropdown
               placeholder="Select"
               disabled={!c.classId}
-              options={c.sections.map((s): SelectOption => ({ id: s.id, name: s.name }))}
-              value={(() => {
-                const s = c.sections.find((s) => s.id === c.sectionId);
-                return s ? { id: s.id, name: s.name } : null;
-              })()}
+              options={sectionOptions}
+              value={sectionOptions.find((option) => option.id === c.sectionId) ?? null}
               onChange={(o) => c.setSectionId(String(o.id))}
             />
           </div>
@@ -88,11 +90,8 @@ const Homework = () => {
                     <FormControl>
                       <CustomSelectDropdown
                         placeholder="Select subject"
-                        options={c.subjects.map((s): SelectOption => ({ id: s.id, name: s.name }))}
-                        value={(() => {
-                          const s = c.subjects.find((s) => s.id === field.value);
-                          return s ? { id: s.id, name: s.name } : null;
-                        })()}
+                        options={subjectOptions}
+                        value={subjectOptions.find((option) => option.id === field.value) ?? null}
                         onChange={(o) => field.onChange(String(o.id))}
                       />
                     </FormControl>
@@ -130,36 +129,17 @@ const Homework = () => {
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <FormField
-                control={c.form.control}
-                name="assignedDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assigned Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+              <DateField form={c.form} name="assignedDate" label="Assigned Date" />
+              <DateField form={c.form} name="dueDate" label="Due Date" />
+              <FileField
+                form={c.form}
+                name="attachment"
+                label={t("labels.attachment")}
+                accept=".pdf,application/pdf"
+                maxBytes={10 * 1024 * 1024}
+                hint="PDF, up to 10 MB"
+                className="sm:col-span-3"
               />
-              <FormField
-                control={c.form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Due Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div>
-                <Label>{t("labels.attachment")}</Label>
-                <Input type="file" accept=".pdf" onChange={c.handleFileChange} />
-              </div>
             </div>
 
             <div className="flex justify-end gap-3">
@@ -178,7 +158,11 @@ const Homework = () => {
         <div className="bg-white shadow rounded-lg">
           <EmptyState
             title={c.classes.length ? "Pick a class and section" : "No classes yet"}
-            description={c.classes.length ? "Choose a class and section above to see and assign its homework." : "Add an academic year, classes and sections on the Classes page first."}
+            description={
+              c.classes.length
+                ? "Choose a class and section above to see and assign its homework."
+                : "Add an academic year, classes and sections on the Classes page first."
+            }
           />
         </div>
       )}
@@ -221,7 +205,11 @@ const Homework = () => {
                       )}
                     </p>
                   </div>
-                  <Button variant="link" className="text-red-600 hover:text-red-800" onClick={() => c.handleDelete(hw.id)}>
+                  <Button
+                    variant="link"
+                    className="text-red-600 hover:text-red-800"
+                    onClick={() => c.handleDelete(hw.id)}
+                  >
                     {t("buttons.delete")}
                   </Button>
                 </div>

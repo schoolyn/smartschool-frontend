@@ -1,11 +1,11 @@
-import DataTable from "@/components/data-table";
-import EmptyState from "@/components/empty-state";
-import ErrorState from "@/components/error-state";
-import { SelectField, TextField } from "@/components/form-fields";
-import SectionHeader from "@/components/section-header";
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
+import DataTable from "@/shared/ui/data-table";
+import EmptyState from "@/shared/ui/empty-state";
+import ErrorState from "@/shared/ui/error-state";
+import { SelectField, DateTimeField } from "@/shared/ui/form-fields";
+import SectionHeader from "@/shared/ui/section-header";
+import { Button } from "@/shared/ui/kit/button";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
+import { Form } from "@/shared/ui/kit/form";
 import { agendaColumns } from "./ptm-columns";
 import useTeacherPTMController from "./ptm-controller";
 
@@ -42,10 +42,16 @@ const TeacherPTM = () => {
           <Form {...form}>
             <form onSubmit={handleGenerateSlots} noValidate>
               <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-4">
-                <SelectField form={form} name="eventId" label="PTM event" options={eventOptions} onValueChange={onEventChange} />
+                <SelectField
+                  form={form}
+                  name="eventId"
+                  label="PTM event"
+                  options={eventOptions}
+                  onValueChange={onEventChange}
+                />
                 <SelectField form={form} name="sectionId" label="Section" options={sectionOptions} />
-                <TextField form={form} name="startAt" label="From" type="datetime-local" />
-                <TextField form={form} name="endAt" label="To" type="datetime-local" />
+                <DateTimeField form={form} name="startAt" label="From" />
+                <DateTimeField form={form} name="endAt" label="To" />
               </div>
               <Button type="submit" className="mt-4" loading={isGeneratingSlots}>
                 Generate slots

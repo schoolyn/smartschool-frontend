@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { downloadReportCard, useEmailReportCard, useGetMyResults } from "@/pages/admin/reports/service/exams-service";
-import { IAPIError, IResult } from "@/types";
+import { downloadReportCard, useEmailReportCard, useGetMyResults } from "@/entities/exam";
+import { IAPIError } from "@/shared/types";
+import { IResult } from "@/entities/exam";
 
 const examIdOf = (result: IResult) => (typeof result.examId === "object" ? result.examId.id : result.examId);
 
@@ -16,7 +17,9 @@ const useParentReportsController = () => {
     try {
       await downloadReportCard(organizationId || "", examIdOf(result), studentId);
     } catch (error) {
-      toast.error((error as IAPIError)?.response?.Error?.message || "Could not download the report card. Please try again.");
+      toast.error(
+        (error as IAPIError)?.response?.Error?.message || "Could not download the report card. Please try again."
+      );
     }
   };
 
@@ -26,7 +29,8 @@ const useParentReportsController = () => {
       {
         onSuccess: () => toast.success("Report card emailed to your registered email address."),
         // for example "No registered email address found" says what to fix
-        onError: (error) => toast.error(error?.response?.Error?.message || "Could not email the report card. Please try again."),
+        onError: (error) =>
+          toast.error(error?.response?.Error?.message || "Could not email the report card. Please try again."),
       }
     );
   };

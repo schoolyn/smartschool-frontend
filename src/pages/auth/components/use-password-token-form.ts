@@ -5,14 +5,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import type { UseMutationResult } from "@tanstack/react-query";
 
-import { useAuth } from "@/context/auth-context";
-import { IAPIError } from "@/types";
+import { useAuth } from "@/entities/session";
+import { IAPIError } from "@/shared/types";
 import { passwordSchema, PasswordFormValues } from "./password.schema";
 
 type PasswordMutation = UseMutationResult<void, IAPIError, { token: string; password: string }>;
 
-// shared by the invite (set password) and forgot-password (reset password) pages: both arrive from an emailed
-// link carrying a token, ask for a new password twice, and send the user to sign in afterwards
+// shared by invite and reset pages: an emailed token link, a new password twice, then sign in
 export const usePasswordTokenForm = (mutation: PasswordMutation, successMessage: string) => {
   const navigate = useNavigate();
   const { endSession } = useAuth();
@@ -39,7 +38,7 @@ export const usePasswordTokenForm = (mutation: PasswordMutation, successMessage:
           navigate("/login");
         },
         onError: (err) => setError(err?.response?.Error?.message || "Something went wrong. Please try again."),
-      },
+      }
     );
   });
 

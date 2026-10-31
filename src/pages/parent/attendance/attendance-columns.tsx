@@ -1,6 +1,6 @@
-import { DataTableColumn } from "@/components/data-table";
-import { Badge, BadgeTone } from "@/components/ui/badge";
-import { AttendanceStatus, IAttendanceRecord } from "@/types";
+import { DataTableColumn } from "@/shared/ui/data-table";
+import { Badge, BadgeTone } from "@/shared/ui/kit/badge";
+import { AttendanceStatus, IAttendanceRecord } from "@/entities/attendance";
 
 const STATUS_TONE: Record<AttendanceStatus, BadgeTone> = {
   present: "green",

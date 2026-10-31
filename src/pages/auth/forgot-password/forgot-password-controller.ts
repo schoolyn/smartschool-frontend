@@ -4,10 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import ReCAPTCHA from "react-google-recaptcha";
 
-import { useForgotPassword } from "../service";
-import useError from "@/hooks/error/error";
+import { useForgotPassword } from "@/entities/session";
+import useError from "@/shared/lib/hooks/error/error";
 import { forgotPasswordSchema, ForgotPasswordFormValues } from "./forgot-password.schema";
-import { GOOGLE_CAPTCHA_KEY } from "@/utils";
+import { GOOGLE_CAPTCHA_KEY } from "@/shared/lib";
 
 const useForgotPasswordController = () => {
   const { t } = useTranslation();
@@ -41,8 +41,8 @@ const useForgotPasswordController = () => {
         email: values.email,
         captcha_token: captchaToken,
       });
-    } catch (submitError) {
-      console.log(submitError);
+    } catch {
+      // the error toast comes from useError above
     }
   });
 

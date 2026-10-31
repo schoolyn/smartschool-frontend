@@ -1,6 +1,6 @@
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 
-import { AttendanceStatus } from "@/types";
+import { AttendanceStatus } from "@/entities/attendance";
 
 interface RegisterStatusProps {
   counts: Record<AttendanceStatus, number> & { total: number };

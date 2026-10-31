@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { RowMenuItem } from "@/components/row-menu";
-import { useMutationFeedback } from "@/hooks";
-import { IAcademicYear } from "@/types";
-import { useCreateAcademicYear, useGetAcademicYears, useUpdateAcademicYear } from "../service/academics-service";
+import { RowMenuItem } from "@/shared/ui/row-menu";
+import { useMutationFeedback } from "@/shared/lib/hooks";
+import { IAcademicYear } from "@/entities/academics";
+import { useCreateAcademicYear, useGetAcademicYears, useUpdateAcademicYear } from "@/entities/academics";
 import { defaultYearFormValues, yearFormSchema, YearFormValues } from "../classes.schema";
 
 export type YearAction = "current" | "close" | "reopen";
@@ -32,7 +32,7 @@ const useYearsTabController = (organizationId: string) => {
             endDate: year.endDate.slice(0, 10),
             isCurrent: year.isCurrent,
           }
-        : defaultYearFormValues,
+        : defaultYearFormValues
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialog]);
@@ -64,7 +64,7 @@ const useYearsTabController = (organizationId: string) => {
     updateYear.mutate(
       action === "current"
         ? { id: year.id, isCurrent: true }
-        : { id: year.id, status: action === "close" ? "closed" : "active" },
+        : { id: year.id, status: action === "close" ? "closed" : "active" }
     );
   };
 

@@ -1,10 +1,10 @@
-import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
+import { ImageDropzone } from "@/shared/ui/file-dropzone";
 
-import { TextareaField, TextField } from "@/components/form-fields";
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import LetterheadForm from "./components/letterhead-form";
+import { TextareaField, TextField } from "@/shared/ui/form-fields";
+import { Button } from "@/shared/ui/kit/button";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
+import { Form } from "@/shared/ui/kit/form";
+import { LetterheadForm } from "@/features/letterhead";
 import useSchoolSettingsController from "./school-controller";
 
 // the school's name, logo and registration details, as printed on certificates
@@ -17,25 +17,17 @@ const SchoolSettings = () => {
       <Card>
         <CardTitle className="font-medium">School details</CardTitle>
         <div className="mt-4 flex flex-col gap-6 sm:flex-row">
-          <div className="flex shrink-0 flex-col items-center gap-2">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
-              {c.organization?.logo?.url ? (
-                <img src={c.organization.logo.url} alt="School logo" className="h-full w-full object-contain" />
-              ) : (
-                <BuildingOffice2Icon className="h-10 w-10 text-gray-400" />
-              )}
-            </div>
-            <input
-              ref={c.logoInput}
-              type="file"
-              accept="image/png,image/jpeg"
-              className="hidden"
-              onChange={(e) => c.onLogoChosen(e.target.files?.[0])}
+          <div className="shrink-0">
+            <ImageDropzone
+              src={c.organization?.logo?.url ?? null}
+              onPick={c.onLogoChosen}
+              alt="School logo"
+              fit="contain"
+              maxBytes={10 * 1024 * 1024}
+              hint={c.isUploadingLogo ? "Uploading..." : "PNG or JPG, up to 10 MB"}
+              disabled={c.isUploadingLogo}
+              className="h-32 w-32"
             />
-            <Button variant="secondary" size="sm" loading={c.isUploadingLogo} onClick={c.pickLogo}>
-              {c.organization?.logo?.url ? "Change logo" : "Upload logo"}
-            </Button>
-            <p className="text-xs text-gray-500">PNG or JPG</p>
           </div>
           <Form {...form}>
             <form onSubmit={c.onSubmit} noValidate className="flex-1 space-y-4">

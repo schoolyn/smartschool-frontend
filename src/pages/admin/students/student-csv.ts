@@ -1,4 +1,4 @@
-import { exportToCsv } from "@/utils";
+import { exportToCsv } from "@/shared/lib";
 
 export const STUDENT_CSV_REQUIRED = [
   "name",
@@ -9,7 +9,13 @@ export const STUDENT_CSV_REQUIRED = [
   "city",
   "state",
 ] as const;
-export const STUDENT_CSV_OPTIONAL = ["parentName", "phoneNumber", "pincode"] as const;
+export const STUDENT_CSV_OPTIONAL = [
+  "parentName",
+  "phoneNumber",
+  "pincode",
+  "admissionNumber",
+  "admissionDate",
+] as const;
 
 type CsvRow = Record<(typeof STUDENT_CSV_REQUIRED)[number] | (typeof STUDENT_CSV_OPTIONAL)[number], string>;
 
@@ -25,6 +31,8 @@ const SAMPLE_ROWS: CsvRow[] = [
     city: "Pune",
     state: "Maharashtra",
     pincode: "411001",
+    admissionNumber: "ADM-1021",
+    admissionDate: "2021-04-05",
   },
   {
     name: "Diya Patel",
@@ -37,6 +45,8 @@ const SAMPLE_ROWS: CsvRow[] = [
     city: "Pune",
     state: "Maharashtra",
     pincode: "411002",
+    admissionNumber: "",
+    admissionDate: "",
   },
 ];
 

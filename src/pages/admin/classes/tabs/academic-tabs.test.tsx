@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { pickDate } from "@/test/pick-date";
 
 import YearsTab from "./years-tab";
 import ClassesTab from "./classes-tab";
 import SectionsTab from "./sections-tab";
-import SectionHeader, { HeaderActionsProvider } from "@/components/section-header";
+import SectionHeader, { HeaderActionsProvider } from "@/shared/ui/section-header";
 
 const mutation = () => ({ mutate: vi.fn(), isPending: false, isSuccess: false, isError: false });
 
@@ -24,7 +25,7 @@ const hooks = vi.hoisted(() => ({
   deactivateSection: null as unknown,
 }));
 
-vi.mock("../service/academics-service", () => ({
+vi.mock("@/entities/academics/api/academics-service", () => ({
   useGetAcademicYears: () => hooks.years,
   useCreateAcademicYear: () => hooks.createYear,
   useUpdateAcademicYear: () => hooks.updateYear,
@@ -42,8 +43,8 @@ vi.mock("../service/academics-service", () => ({
   useUpdateSection: () => hooks.updateSection,
   useDeactivateSection: () => hooks.deactivateSection,
 }));
-vi.mock("../service/teachers-service", () => ({ useGetAllTeachers: () => ({ data: { items: [] } }) }));
-vi.mock("@/hooks", () => ({ useMutationFeedback: vi.fn() }));
+vi.mock("@/entities/academics/api/teachers-service", () => ({ useGetAllTeachers: () => ({ data: { items: [] } }) }));
+vi.mock("@/shared/lib/hooks", () => ({ useMutationFeedback: vi.fn() }));
 
 const year = (overrides: object) => ({
   id: "y",
@@ -148,8 +149,8 @@ describe("YearsTab", () => {
     await user.click(screen.getByRole("button", { name: "Add academic year" }));
 
     await user.type(screen.getByLabelText("Name"), "2027-28");
-    await user.type(screen.getByLabelText("Starts"), "2027-04-01");
-    await user.type(screen.getByLabelText("Ends"), "2027-01-01");
+    await pickDate(user, "Starts", "2027-04-01");
+    await pickDate(user, "Ends", "2027-01-01");
     await user.click(screen.getByRole("button", { name: "Add year" }));
 
     expect(await screen.findByText("The end date must be after the start date.")).toBeInTheDocument();

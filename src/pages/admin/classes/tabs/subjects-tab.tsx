@@ -1,12 +1,12 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import type { Action } from "@/components/action-buttons";
-import { useHeaderActions } from "@/components/section-header";
-import DataTable from "@/components/data-table";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import FormDialog from "@/components/form-dialog";
-import { SelectField, TextField } from "@/components/form-fields";
-import { IAcademicYear } from "@/types";
+import type { Action } from "@/shared/ui/action-buttons";
+import { useHeaderActions } from "@/shared/ui/section-header";
+import DataTable from "@/shared/ui/data-table";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import FormDialog from "@/shared/ui/form-dialog";
+import { SelectField, TextField } from "@/shared/ui/form-fields";
+import { IAcademicYear } from "@/entities/academics";
 import { SUBJECT_TYPES } from "../classes.schema";
 import ShowInactiveToggle from "../components/show-inactive-toggle";
 import YearPicker from "../components/year-picker";
@@ -49,7 +49,10 @@ const SubjectsTab = ({ organizationId, years, yearId, onYearChange }: SubjectsTa
                 description:
                   "Add the subjects you teach, such as Mathematics (MATH). Homework, marks and teacher assignments use them.",
               }
-            : { title: "Choose an academic year", description: "Subjects are set up per academic year. Pick one from the year menu, or add a year first." }
+            : {
+                title: "Choose an academic year",
+                description: "Subjects are set up per academic year. Pick one from the year menu, or add a year first.",
+              }
         }
       />
 

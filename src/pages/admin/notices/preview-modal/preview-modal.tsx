@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import Spinner from "@/components/spinner";
+import { Dialog, DialogContent, DialogTitle } from "@/shared/ui/kit/dialog";
+import { Button } from "@/shared/ui/kit/button";
+import Spinner from "@/shared/ui/spinner";
 
 interface AttachmentPreviewModalProps {
   isOpen: boolean;
@@ -21,7 +21,7 @@ const AttachmentPreviewModal = ({
   const [isLoading, setIsLoading] = useState(true);
   const [viewerFailed, setViewerFailed] = useState(false);
 
-  // Use Google Docs Viewer for reliable PDF preview
+  // Google Docs Viewer gives a more reliable PDF preview
   const googleDocsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(attachmentURL)}&embedded=true`;
 
   const handleIframeLoad = () => {

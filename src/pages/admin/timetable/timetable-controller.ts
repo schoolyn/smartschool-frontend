@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import { useError } from "@/hooks";
-import { ITimetableSlot } from "@/types";
-import { useGetSubjects, useGetTeacherAssignments } from "../classes/service/academics-service";
-import { useSectionPicker } from "../classes/service/use-section-picker";
-import { useDeleteTimetableSlot, useGetTimetable } from "./service/timetable-service";
+import { useError } from "@/shared/lib/hooks";
+import { ITimetableSlot } from "@/entities/timetable";
+import { useGetSubjects, useGetTeacherAssignments } from "@/entities/academics";
+import { useSectionPicker } from "@/features/section-picker";
+import { useDeleteTimetableSlot, useGetTimetable } from "@/entities/timetable";
 
 // admins build each section's week; a teacher sees their own week across every class they teach
 const useTimetableController = () => {
@@ -22,7 +22,9 @@ const useTimetableController = () => {
   const remove = useDeleteTimetableSlot(organizationId);
   useError({ mutation: remove });
 
-  const sectionAssignments = (assignments.data?.items ?? []).filter((a) => a.sectionId?.id === sectionId && a.status !== "inactive");
+  const sectionAssignments = (assignments.data?.items ?? []).filter(
+    (a) => a.sectionId?.id === sectionId && a.status !== "inactive"
+  );
 
   const confirmRemove = () =>
     toRemove &&

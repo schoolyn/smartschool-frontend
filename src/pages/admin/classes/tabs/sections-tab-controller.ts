@@ -2,17 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { RowMenuItem } from "@/components/row-menu";
-import { useMutationFeedback } from "@/hooks";
-import { ISection } from "@/types";
+import { RowMenuItem } from "@/shared/ui/row-menu";
+import { useMutationFeedback } from "@/shared/lib/hooks";
+import { ISection } from "@/entities/academics";
 import {
   useCreateSection,
   useDeactivateSection,
   useGetClasses,
   useGetSections,
   useUpdateSection,
-} from "../service/academics-service";
-import { useGetAllTeachers } from "../service/teachers-service";
+} from "@/entities/academics";
+import { useGetAllTeachers } from "@/entities/academics";
 import { defaultSectionFormValues, sectionFormSchema, SectionFormValues } from "../classes.schema";
 
 const NO_TEACHER = "none";
@@ -50,7 +50,7 @@ const useSectionsTabController = (organizationId: string, yearId: string, classI
         name: `${teacher.name} (${teacher.email})`,
       })),
     ],
-    [teachers.data],
+    [teachers.data]
   );
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const useSectionsTabController = (organizationId: string, yearId: string, classI
             roomNumber: section.roomNumber ?? "",
             classTeacherId: section.classTeacherId?.id ?? NO_TEACHER,
           }
-        : { ...defaultSectionFormValues, classTeacherId: NO_TEACHER },
+        : { ...defaultSectionFormValues, classTeacherId: NO_TEACHER }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialog]);

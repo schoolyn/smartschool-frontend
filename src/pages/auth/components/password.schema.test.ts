@@ -21,7 +21,7 @@ describe("passwordSchema", () => {
     "rejects %s, which has fewer than 3 kinds of character",
     (password) => {
       expect(firstError(password)).toBe("Password must contain at least 3 of: lowercase, uppercase, number, symbol.");
-    },
+    }
   );
 
   it("rejects passwords that do not match, reporting it on the confirmation field", () => {

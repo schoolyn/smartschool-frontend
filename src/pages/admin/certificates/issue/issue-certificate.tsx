@@ -6,19 +6,19 @@ import {
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 
-import DataTable from "@/components/data-table";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import ErrorState from "@/components/error-state";
-import { CheckboxField, DateField, SelectField, TextareaField, TextField } from "@/components/form-fields";
-import PageLoader from "@/components/page-loader";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LetterheadForm } from "@/pages/admin/settings/school";
-import { CertificateType } from "@/types";
-import { formatDate } from "@/utils";
+import DataTable from "@/shared/ui/data-table";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import ErrorState from "@/shared/ui/error-state";
+import { CheckboxField, DateField, SelectField, TextareaField, TextField } from "@/shared/ui/form-fields";
+import PageLoader from "@/shared/ui/page-loader";
+import { Badge } from "@/shared/ui/kit/badge";
+import { Button } from "@/shared/ui/kit/button";
+import { Card, CardTitle } from "@/shared/ui/kit/card";
+import { Form } from "@/shared/ui/kit/form";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/kit/tabs";
+import { LetterheadForm } from "@/features/letterhead";
+import { CertificateType } from "@/entities/certificate";
+import { formatDate } from "@/shared/lib";
 import { certificateColumns } from "../certificate-columns";
 import { CATEGORY_OPTIONS, GENDER_OPTIONS, PURPOSE_OPTIONS } from "./issue-certificate.schema";
 import useIssueCertificateController from "./issue-certificate-controller";

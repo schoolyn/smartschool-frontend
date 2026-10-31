@@ -4,12 +4,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-import { useUpdateOrganization, useUploadOrganizationLogo } from "../service";
-import { useError } from "@/hooks";
-import { IOrganization } from "@/types";
+import { useUpdateOrganization, useUploadOrganizationLogo } from "@/entities/organization";
+import { useError } from "@/shared/lib/hooks";
+import { IOrganization } from "@/entities/organization";
 import { organizationFormSchema, OrganizationFormValues } from "./edit-organization-modal.schema";
 
-const useEditOrganizationModalController = (isOpen: boolean, onClose: () => void, onSaved: () => void, organization: IOrganization | null) => {
+const useEditOrganizationModalController = (
+  isOpen: boolean,
+  onClose: () => void,
+  onSaved: () => void,
+  organization: IOrganization | null
+) => {
   const { t } = useTranslation();
   const updateOrganization = useUpdateOrganization();
   const uploadLogo = useUploadOrganizationLogo();
@@ -59,10 +64,14 @@ const useEditOrganizationModalController = (isOpen: boolean, onClose: () => void
         onSuccess: async () => {
           toast.success("Organization updated successfully.");
           if (logoFile) {
-            // the organization itself is already saved at this point - a logo failure
-            // shouldn't block the modal from closing, but the user still needs to know
+            // the organization is already saved, so a logo failure shouldn't block closing, but the user must know
             await uploadLogo.mutateAsync({ organizationId: organization.id, file: logoFile }).catch(() => {
-              toast.error(t("messages.organization_logo_upload_failed", "Logo upload failed. You can try again from the school settings."));
+              toast.error(
+                t(
+                  "messages.organization_logo_upload_failed",
+                  "Logo upload failed. You can try again from the school settings."
+                )
+              );
             });
           }
           onSaved();

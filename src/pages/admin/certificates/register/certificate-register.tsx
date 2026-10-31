@@ -1,9 +1,10 @@
-import CustomSelectDropdown from "@/components/custom-select";
-import DataTable from "@/components/data-table";
-import ErrorState from "@/components/error-state";
-import ExportDialog from "@/components/export-dialog";
-import SectionHeader from "@/components/section-header";
-import { CertificateType, SelectOption } from "@/types";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import DataTable from "@/shared/ui/data-table";
+import ErrorState from "@/shared/ui/error-state";
+import { ExportDialog } from "@/features/export-dialog";
+import SectionHeader from "@/shared/ui/section-header";
+import { CertificateType } from "@/entities/certificate";
+import { SelectOption } from "@/shared/types";
 import { certificateColumns } from "../certificate-columns";
 import useCertificateRegisterController from "./certificate-register-controller";
 

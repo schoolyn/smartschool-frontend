@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 
-import SectionHeader, { HeaderActionsProvider } from "@/components/section-header";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SectionHeader, { HeaderActionsProvider } from "@/shared/ui/section-header";
+import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/kit/tabs";
 import useUserManagementController from "./user-management-controller";
 
 const UserManagement = () => {

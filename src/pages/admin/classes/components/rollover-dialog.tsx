@@ -1,7 +1,8 @@
-import FormDialog from "@/components/form-dialog";
-import { Switch } from "@/components/ui/switch";
-import { IAcademicYear } from "@/types";
-import { SelectField, TextField } from "@/components/form-fields";
+import { countLabel } from "@/shared/ui/data-table";
+import FormDialog from "@/shared/ui/form-dialog";
+import { Switch } from "@/shared/ui/kit/switch";
+import { IAcademicYear } from "@/entities/academics";
+import { SelectField, TextField, DateField } from "@/shared/ui/form-fields";
 import useRolloverDialogController from "./rollover-dialog-controller";
 
 interface RolloverDialogProps {
@@ -12,7 +13,7 @@ interface RolloverDialogProps {
   onClose: () => void;
 }
 
-const plural = (count: number, singular: string, many = `${singular}s`) => `${count} ${count === 1 ? singular : many}`;
+const plural = (count: number, one: string, other = `${one}s`) => countLabel(count, { one, other });
 
 const CheckRow = ({
   checked,
@@ -42,10 +43,20 @@ const CheckRow = ({
   </label>
 );
 
-// "Start next year": pick the year to copy from, name the new one, and see exactly what will be copied before it is
+// "Start next year": pick the year to copy from, name the new one, and preview what will be copied
 const RolloverDialog = ({ organizationId, years, sourceYear, onClose }: RolloverDialogProps) => {
-  const { form, source, counts, countsDetail, onSourceChange, submit, isSubmitting, yearOptions, copyClasses, copySubjects } =
-    useRolloverDialogController({ organizationId, years, sourceYear, onClose });
+  const {
+    form,
+    source,
+    counts,
+    countsDetail,
+    onSourceChange,
+    submit,
+    isSubmitting,
+    yearOptions,
+    copyClasses,
+    copySubjects,
+  } = useRolloverDialogController({ organizationId, years, sourceYear, onClose });
 
   return (
     <FormDialog
@@ -68,8 +79,8 @@ const RolloverDialog = ({ organizationId, years, sourceYear, onClose }: Rollover
       />
       <TextField form={form} name="name" label="New year name" placeholder="2027-28" />
       <div className="grid grid-cols-2 gap-4">
-        <TextField form={form} name="startDate" label="Starts" type="date" />
-        <TextField form={form} name="endDate" label="Ends" type="date" />
+        <DateField form={form} name="startDate" label="Starts" />
+        <DateField form={form} name="endDate" label="Ends" />
       </div>
 
       <div className="space-y-3 rounded-md border border-gray-200 bg-gray-50 p-4">
@@ -79,7 +90,7 @@ const RolloverDialog = ({ organizationId, years, sourceYear, onClose }: Rollover
         <CheckRow
           label="Classes and sections"
           detail={countsDetail(
-            (c) => `${plural(c.classes, "class", "classes")} with ${plural(c.sections, "section")} (active ones only)`,
+            (c) => `${plural(c.classes, "class", "classes")} with ${plural(c.sections, "section")} (active ones only)`
           )}
           checked={copyClasses}
           disabled={!counts?.classes}

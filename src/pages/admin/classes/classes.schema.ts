@@ -7,7 +7,7 @@ const optionalPositiveInteger = (label: string) =>
     .trim()
     .refine(
       (value) => value === "" || (/^\d+$/.test(value) && Number(value) > 0),
-      `${label} must be a whole number above 0.`,
+      `${label} must be a whole number above 0.`
     );
 
 export const yearFormSchema = z

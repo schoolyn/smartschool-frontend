@@ -1,12 +1,12 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import type { Action } from "@/components/action-buttons";
-import { useHeaderActions } from "@/components/section-header";
-import DataTable from "@/components/data-table";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import FormDialog from "@/components/form-dialog";
-import { TextField } from "@/components/form-fields";
-import { Switch } from "@/components/ui/switch";
+import type { Action } from "@/shared/ui/action-buttons";
+import { useHeaderActions } from "@/shared/ui/section-header";
+import DataTable from "@/shared/ui/data-table";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import FormDialog from "@/shared/ui/form-dialog";
+import { TextField, DateField } from "@/shared/ui/form-fields";
+import { Switch } from "@/shared/ui/kit/switch";
 import RolloverDialog from "../components/rollover-dialog";
 import { yearColumns } from "./years-tab-columns";
 import useYearsTabController, { YearAction } from "./years-tab-controller";
@@ -66,8 +66,8 @@ const YearsTab = ({ organizationId }: { organizationId: string }) => {
       >
         <TextField form={c.form} name="name" label="Name" placeholder="2026-27" autoFocus />
         <div className="grid grid-cols-2 gap-4">
-          <TextField form={c.form} name="startDate" label="Starts" type="date" />
-          <TextField form={c.form} name="endDate" label="Ends" type="date" />
+          <DateField form={c.form} name="startDate" label="Starts" />
+          <DateField form={c.form} name="endDate" label="Ends" />
         </div>
         {!c.dialog?.year && (
           <label className="flex items-center gap-3 text-sm text-gray-700">
@@ -80,7 +80,12 @@ const YearsTab = ({ organizationId }: { organizationId: string }) => {
         )}
       </FormDialog>
 
-      <RolloverDialog organizationId={organizationId} years={c.items} sourceYear={c.rolloverFrom} onClose={c.closeRollover} />
+      <RolloverDialog
+        organizationId={organizationId}
+        years={c.items}
+        sourceYear={c.rolloverFrom}
+        onClose={c.closeRollover}
+      />
 
       <DeleteConfirmationDialog
         open={!!c.pending}

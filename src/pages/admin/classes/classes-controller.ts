@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useGetAcademicYears, useGetClasses } from "./service/academics-service";
+import { useTabParam } from "@/shared/lib/hooks";
+import { useGetAcademicYears, useGetClasses } from "@/entities/academics";
 
-export type ClassesTabKey = "years" | "classes" | "sections" | "subjects" | "teachers";
+const CLASSES_TABS = ["years", "classes", "sections", "subjects", "teachers"] as const;
+export type ClassesTabKey = (typeof CLASSES_TABS)[number];
 
 const useClassesController = () => {
   const { organizationId = "" } = useParams();
 
-  const [activeTab, setActiveTab] = useState<ClassesTabKey>("years");
+  const [activeTab, setActiveTab] = useTabParam(CLASSES_TABS, "classes");
   const [yearId, setYearId] = useState("");
   const [classId, setClassId] = useState("");
 

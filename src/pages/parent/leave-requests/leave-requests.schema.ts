@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { localDateString } from "@/utils";
+import { localDateString } from "@/shared/lib";
 
 const today = () => localDateString();
 

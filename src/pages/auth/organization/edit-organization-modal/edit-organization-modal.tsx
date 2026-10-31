@@ -1,10 +1,10 @@
 import { BuildingOffice2Icon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 
-import FormDialog from "@/components/form-dialog";
-import { TextField, TextareaField } from "@/components/form-fields";
-import ButtonSpinner from "@/icons/button-spinner";
+import FormDialog from "@/shared/ui/form-dialog";
+import { TextField, TextareaField } from "@/shared/ui/form-fields";
+import ButtonSpinner from "@/shared/ui/icons/button-spinner";
 import useEditOrganizationModalController from "./edit-organization-modal-controller";
-import { IOrganization } from "@/types";
+import { IOrganization } from "@/entities/organization";
 
 interface EditOrganizationModalProps {
   isOpen: boolean;

@@ -1,10 +1,10 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 
-import DataTable from "@/components/data-table";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import NoticeModal from "@/components/notice-modal";
-import NoticePreviewModal from "@/components/notice-preview-modal/notice-preview-modal";
-import SectionHeader from "@/components/section-header";
+import DataTable from "@/shared/ui/data-table";
+import DeleteConfirmationDialog from "@/shared/ui/delete-confirmation-dialog";
+import { NoticeModalWrapper as NoticeModal } from "@/features/notice-modal";
+import { NoticePreviewModal } from "@/features/notice-modal";
+import SectionHeader from "@/shared/ui/section-header";
 import { noticeColumns } from "./notice-columns";
 import useNoticeController from "./notice-controller";
 import AttachmentPreviewModal from "./preview-modal";
@@ -78,11 +78,7 @@ const AdminNotices = () => {
       />
 
       {previewNotice && (
-        <NoticePreviewModal
-          isOpen={!!previewNotice}
-          onClose={closePreviewNotice}
-          notice={previewNotice}
-        />
+        <NoticePreviewModal isOpen={!!previewNotice} onClose={closePreviewNotice} notice={previewNotice} />
       )}
 
       <AttachmentPreviewModal

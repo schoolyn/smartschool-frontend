@@ -4,7 +4,12 @@ import { ArrowUpRightIcon } from "@heroicons/react/24/outline";
 
 import { useCountUp } from "./use-count-up";
 
-const rupees = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const rupees = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
 
 interface StatCardProps {
   title: string;

@@ -1,11 +1,11 @@
-import DataTable from "@/components/data-table";
-import CustomSelectDropdown from "@/components/custom-select";
-import ErrorState from "@/components/error-state";
-import SectionHeader from "@/components/section-header";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { SelectOption } from "@/types";
+import DataTable from "@/shared/ui/data-table";
+import CustomSelectDropdown from "@/shared/ui/custom-select";
+import ErrorState from "@/shared/ui/error-state";
+import MonthPicker from "@/shared/ui/month-picker";
+import SectionHeader from "@/shared/ui/section-header";
+import { Card } from "@/shared/ui/kit/card";
+import { Label } from "@/shared/ui/kit/label";
+import { SelectOption } from "@/shared/types";
 import { attendanceColumns } from "./attendance-columns";
 import useParentAttendanceController from "./attendance-controller";
 
@@ -40,12 +40,7 @@ const ParentAttendance = () => {
         )}
         <div className="w-48">
           <Label>Month</Label>
-          <Input
-            type="month"
-            value={c.month}
-            max={c.maxMonth}
-            onChange={(e) => e.target.value && c.setMonth(e.target.value)}
-          />
+          <MonthPicker value={c.month} max={c.maxMonth} onChange={c.setMonth} />
         </div>
       </div>
 

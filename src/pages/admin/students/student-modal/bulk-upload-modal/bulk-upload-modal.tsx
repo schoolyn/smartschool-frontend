@@ -1,9 +1,9 @@
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
-import { FileField, SelectField } from "@/components/form-fields";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
+import { FileField, SelectField } from "@/shared/ui/form-fields";
+import { Button } from "@/shared/ui/kit/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/shared/ui/kit/dialog";
+import { Form } from "@/shared/ui/kit/form";
 import useBulkUploadModalController from "./bulk-upload-modal-controller";
 import { downloadStudentSampleCsv, STUDENT_CSV_OPTIONAL, STUDENT_CSV_REQUIRED } from "../../student-csv";
 
@@ -44,6 +44,9 @@ const BulkUploadModal = ({ isOpen, organizationId, onClose, onImported }: BulkUp
               <code className="text-xs">{STUDENT_CSV_OPTIONAL.join(", ")}</code>
             </p>
             <p>Dates use YYYY-MM-DD (for example 2015-06-21). Each roll number must be unique within the section.</p>
+            <p>
+              Keep your existing admission numbers in admissionNumber; a blank one gets the next number in your series.
+            </p>
             <Button variant="link" onClick={downloadStudentSampleCsv} className="gap-1">
               <ArrowDownTrayIcon className="h-4 w-4" />
               Download sample CSV
@@ -97,7 +100,14 @@ const BulkUploadModal = ({ isOpen, organizationId, onClose, onImported }: BulkUp
                     disabled={!c.classId}
                   />
                 </div>
-                <FileField form={c.form} name="file" label="CSV File" accept=".csv,text/csv" />
+                <FileField
+                  form={c.form}
+                  name="file"
+                  label="CSV file"
+                  accept=".csv,text/csv"
+                  maxBytes={2 * 1024 * 1024}
+                  hint="CSV, up to 2 MB"
+                />
               </form>
             </Form>
           )}

@@ -1,9 +1,9 @@
 import { TFunction } from "i18next";
 
-import { DataTableColumn } from "@/components/data-table";
-import { Badge, BadgeTone } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { IAllUserDetails } from "@/types";
+import { DataTableColumn } from "@/shared/ui/data-table";
+import { Badge, BadgeTone } from "@/shared/ui/kit/badge";
+import { Button } from "@/shared/ui/kit/button";
+import { IAllUserDetails } from "@/entities/user";
 
 const STATUS_TONE: Record<string, BadgeTone> = { active: "green", pending: "yellow", suspended: "red" };
 
@@ -15,8 +15,18 @@ interface UserColumnActions {
   remove: (userId: string) => void;
 }
 
-export const userColumns = ({ t, isSelf, manageAccess, edit, remove }: UserColumnActions): DataTableColumn<IAllUserDetails>[] => [
-  { id: "name", header: t("labels.username"), cell: ({ row }) => <span className="text-gray-900">{row.original.name}</span> },
+export const userColumns = ({
+  t,
+  isSelf,
+  manageAccess,
+  edit,
+  remove,
+}: UserColumnActions): DataTableColumn<IAllUserDetails>[] => [
+  {
+    id: "name",
+    header: t("labels.username"),
+    cell: ({ row }) => <span className="text-gray-900">{row.original.name}</span>,
+  },
   { id: "email", header: t("labels.email"), meta: { align: "center" }, cell: ({ row }) => row.original.email },
   {
     id: "role",

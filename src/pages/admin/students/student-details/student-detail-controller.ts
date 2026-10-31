@@ -1,41 +1,26 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useDeleteStudent, useGetStudentById, useUpdateStudentDetail } from "../service";
-import { useAddGuardian, useSetPrimaryGuardian, useRemoveGuardian } from "../service/guardian-service";
-import { useGetEnrollmentHistory, useTransferStudent, useWithdrawStudent } from "../service/lifecycle-service";
-import { useGetStudentAttendanceHistory } from "../service/attendance-history-service";
-import { useGetResultsForStudent } from "@/pages/admin/reports/service/exams-service";
-import { IStudentFormData } from "@/types";
-import { useError } from "@/hooks";
-import { editStudentSchema } from "../student-modal/create-update-student-modal/student-form.schema";
-import { useAreaBase, useCan } from "@/context/tenant-context";
+import { useDeleteStudent, useGetStudentById } from "@/entities/student";
+import { useAddGuardian, useSetPrimaryGuardian, useRemoveGuardian } from "@/entities/student";
+import { useGetEnrollmentHistory, useTransferStudent, useWithdrawStudent } from "@/entities/student";
+import { useGetStudentAttendanceHistory } from "@/entities/student";
+import { useGetResultsForStudent } from "@/entities/exam";
+import { useError } from "@/shared/lib/hooks";
+import { useAreaBase, useCan } from "@/entities/session";
 
 const useStudentDetailController = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { studentId, organizationId } = useParams();
 
   const areaBase = useAreaBase();
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [guardianIdPendingRemoval, setGuardianIdPendingRemoval] = useState<string | null>(null);
   const [isGuardianModalOpen, setIsGuardianModalOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
-  const form = useForm<IStudentFormData>({
-    resolver: zodResolver(editStudentSchema),
-    defaultValues: {} as IStudentFormData,
-  });
 
   const getStudentDetailById = useGetStudentById(organizationId || "", studentId || "");
-
-  const updateStudent = useUpdateStudentDetail(organizationId || "");
 
   const deleteStudent = useDeleteStudent(organizationId || "");
 
@@ -59,8 +44,7 @@ const useStudentDetailController = () => {
   );
   const examResults = useGetResultsForStudent(organizationId || "", studentId || "");
 
-  // a refused edit (section full, roll number taken) and a refused primary change must be shown
-  useError({ mutation: updateStudent });
+  // a refused primary change must be shown
   useError({ mutation: setPrimaryGuardian });
 
   useError({
@@ -70,56 +54,13 @@ const useStudentDetailController = () => {
     },
   });
 
-  useEffect(() => {
-    if (getStudentDetailById.isSuccess && getStudentDetailById.data) {
-      const item = getStudentDetailById.data.item;
-      form.reset({
-        ...item,
-        academicYearId: item.currentEnrollment?.academicYearId || "",
-        classId: item.currentEnrollment?.classId?.id || "",
-        sectionId: item.currentEnrollment?.sectionId?.id || "",
-        rollNumber: item.currentEnrollment?.rollNumber || "",
-      } as IStudentFormData);
-
-      // arrived here via the list page's "Edit" action - open the edit modal
-      // once the full student data is in, then clear the flag so a refresh/back doesn't reopen it
-      const state = location.state as { openEdit?: boolean } | null;
-      if (state?.openEdit) {
-        setIsEditModalOpen(true);
-        navigate(location.pathname, { replace: true });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getStudentDetailById.isSuccess, getStudentDetailById.data]);
-
-  const onSubmit = form.handleSubmit((values) => {
-    updateStudent.mutate(values);
-  });
-
   const handleDeleteStudent = () => {
     deleteStudent.mutate(studentId || "");
-  };
-
-  const nextStep = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, 2));
-  };
-
-  const prevStep = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const onBackClick = () => {
     navigate(`${areaBase}/students`);
   };
-
-  useEffect(() => {
-    if (updateStudent.isSuccess) {
-      setIsEditModalOpen(false);
-      getStudentDetailById.refetch();
-      setCurrentStep(1);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateStudent.isSuccess]);
 
   useEffect(() => {
     if (deleteStudent.isSuccess) {
@@ -131,7 +72,9 @@ const useStudentDetailController = () => {
 
   useEffect(() => {
     if (addGuardian.isSuccess) {
-      toast.success(addGuardian.data?.invited ? "Guardian added. An invite email was sent to them." : "Guardian added successfully.");
+      toast.success(
+        addGuardian.data?.invited ? "Guardian added. An invite email was sent to them." : "Guardian added successfully."
+      );
       setIsGuardianModalOpen(false);
     }
     if (addGuardian.isError) {
@@ -190,25 +133,16 @@ const useStudentDetailController = () => {
 
   return {
     canManage,
-    t,
     organizationId: organizationId || "",
     studentId: studentId || "",
-    form,
-    currentStep,
-    updateStudent,
-    isEditModalOpen,
+    editStudent: () => navigate(`${areaBase}/students/edit/${studentId}`),
     isDeleteModalOpen,
     isGuardianModalOpen,
     setIsGuardianModalOpen,
     studentDetails: getStudentDetailById?.data?.item,
     isLoadingStudentDetail: getStudentDetailById.isLoading,
     isErrorStudentDetail: getStudentDetailById.isError,
-    onSubmit,
-    nextStep,
-    prevStep,
     onBackClick,
-    setCurrentStep,
-    setIsEditModalOpen,
     setIsDeleteModalOpen,
     isDeletingStudent: deleteStudent.isPending,
     handleDeleteStudent,

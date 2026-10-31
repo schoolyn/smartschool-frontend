@@ -2,10 +2,12 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-import { useError } from "@/hooks";
-import { IPTMEvent, ITeacherAssignment, SelectOption } from "@/types";
+import { useError } from "@/shared/lib/hooks";
+import { IPTMEvent } from "@/entities/ptm";
+import { ITeacherAssignment } from "@/entities/academics";
+import { SelectOption } from "@/shared/types";
 import { defaultSlotWindowValues, slotWindowSchema, SlotWindowFormValues } from "../ptm.schema";
-import { useGenerateSlots, useGetSlotsForEvent } from "../service/ptm-service";
+import { useGenerateSlots, useGetSlotsForEvent } from "@/entities/ptm";
 
 interface EventSlotsPanelControllerProps {
   organizationId: string;
@@ -18,12 +20,17 @@ const useEventSlotsPanelController = ({ organizationId, event, assignments }: Ev
   const generateSlots = useGenerateSlots(organizationId);
   useError({ mutation: generateSlots });
 
-  const form = useForm<SlotWindowFormValues>({ resolver: zodResolver(slotWindowSchema), defaultValues: defaultSlotWindowValues });
+  const form = useForm<SlotWindowFormValues>({
+    resolver: zodResolver(slotWindowSchema),
+    defaultValues: defaultSlotWindowValues,
+  });
   const teacherUserId = useWatch({ control: form.control, name: "teacherUserId" });
 
   const eventAssignments = assignments.filter((a) => a.sectionId && event.sectionIds.includes(a.sectionId.id));
   const teacherOptions: SelectOption[] = [
-    ...new Map(eventAssignments.map((a) => [a.teacherUserId.id, { id: a.teacherUserId.id, name: a.teacherUserId.name }])).values(),
+    ...new Map(
+      eventAssignments.map((a) => [a.teacherUserId.id, { id: a.teacherUserId.id, name: a.teacherUserId.name }])
+    ).values(),
   ];
   // only the event's sections this teacher teaches
   const sectionOptions: SelectOption[] = [

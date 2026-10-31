@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { localDateString } from "@/utils";
+import { localDateString } from "@/shared/lib";
 
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
